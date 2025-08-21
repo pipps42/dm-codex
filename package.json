@@ -1,7 +1,7 @@
 {
   "name": "dm-codex",
   "version": "0.1.0",
-  "main": "dist-electron/main/index.js",
+  "main": "dist-electron/main/main.js",
   "description": "Il compagno digitale definitivo per i Dungeon Master",
   "author": {
     "name": "Filippo Chiariello",
