@@ -19,7 +19,6 @@ export interface CreateCampaignInput {
   name: string
   description?: string
   coverImagePath?: string
-  settings?: Record<string, unknown>
 }
 
 export interface UpdateCampaignInput {
@@ -27,7 +26,6 @@ export interface UpdateCampaignInput {
   name?: string
   description?: string
   coverImagePath?: string
-  settings?: Record<string, unknown>
   lastPlayedAt?: Date
 }
 

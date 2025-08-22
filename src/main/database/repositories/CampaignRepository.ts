@@ -1,21 +1,10 @@
 // Campaign Repository - Data access layer for Campaign entity
 // Wraps PrismaClient operations with type safety and error handling
 
-import { db } from '../client'
+import { PrismaClient } from '../generated/prisma'
 import type { Campaign } from '../generated/prisma'
 import type { CreateCampaignInput, UpdateCampaignInput, CampaignWithStats } from '../../../shared/types/ipc'
 
-// Define extended types for Campaign with count relations
-interface CampaignWithCount extends Campaign {
-  _count?: {
-    npcs?: number
-    locations?: number
-    quests?: number
-    encounters?: number
-    chronicles?: number
-    [key: string]: number | undefined
-  }
-}
 
 // Define Prisma error types
 interface PrismaError extends Error {
@@ -36,34 +25,22 @@ function isPrismaError(error: unknown): error is PrismaError {
 }
 
 export class CampaignRepository {
+  constructor(private prisma: PrismaClient) {}
+
   /**
    * Create a new campaign
    */
   async create(data: CreateCampaignInput): Promise<Campaign> {
     try {
-      const client = await db()
-      // Use dynamic access with proper typing
-      const campaignModel = (client as unknown as { campaign: unknown }).campaign as {
-        create(args: {
-          data: {
-            name: string
-            description?: string
-            coverImagePath?: string
-            settings?: unknown
-          }
-        }): Promise<unknown>
-      }
-
-      const campaign = await campaignModel.create({
+      const campaign = await this.prisma.campaign.create({
         data: {
           name: data.name,
           description: data.description,
-          coverImagePath: data.coverImagePath,
-          settings: data.settings
+          coverImagePath: data.coverImagePath
         }
       })
 
-      return campaign as Campaign
+      return campaign
     } catch (error) {
       if (isPrismaError(error) && error.code === 'P2002') {
         throw new Error(`Campaign with name "${data.name}" already exists`)
@@ -77,25 +54,7 @@ export class CampaignRepository {
    */
   async findAll(): Promise<CampaignWithStats[]> {
     try {
-      const client = await db()
-      const campaignModel = (client as unknown as { campaign: unknown }).campaign as {
-        findMany(args?: {
-          include?: {
-            _count?: {
-              select?: {
-                npcs?: boolean
-                locations?: boolean
-                quests?: boolean
-                encounters?: boolean
-                chronicles?: boolean
-              }
-            }
-          }
-          orderBy?: Array<{ [key: string]: string | { sort: string; nulls?: string } }>
-        }): Promise<unknown[]>
-      }
-
-      const campaigns = await campaignModel.findMany({
+      const campaigns = await this.prisma.campaign.findMany({
         include: {
           _count: {
             select: {
@@ -113,8 +72,7 @@ export class CampaignRepository {
         ]
       })
 
-      const typedCampaigns = campaigns as CampaignWithCount[]
-      return typedCampaigns.map((campaign) => ({
+      return campaigns.map((campaign) => ({
         ...campaign,
         stats: {
           npcCount: campaign._count?.npcs || 0,
@@ -134,25 +92,7 @@ export class CampaignRepository {
    */
   async findById(id: string): Promise<CampaignWithStats | null> {
     try {
-      const client = await db()
-      const campaignModel = (client as unknown as { campaign: unknown }).campaign as {
-        findUnique(args: {
-          where: { id: string }
-          include?: {
-            _count?: {
-              select?: {
-                npcs?: boolean
-                locations?: boolean
-                quests?: boolean
-                encounters?: boolean
-                chronicles?: boolean
-              }
-            }
-          }
-        }): Promise<unknown | null>
-      }
-
-      const campaign = await campaignModel.findUnique({
+      const campaign = await this.prisma.campaign.findUnique({
         where: { id },
         include: {
           _count: {
@@ -171,15 +111,14 @@ export class CampaignRepository {
         return null
       }
 
-      const typedCampaign = campaign as CampaignWithCount
       return {
-        ...typedCampaign,
+        ...campaign,
         stats: {
-          npcCount: typedCampaign._count?.npcs || 0,
-          locationCount: typedCampaign._count?.locations || 0,
-          questCount: typedCampaign._count?.quests || 0,
-          encounterCount: typedCampaign._count?.encounters || 0,
-          chronicleCount: typedCampaign._count?.chronicles || 0
+          npcCount: campaign._count?.npcs || 0,
+          locationCount: campaign._count?.locations || 0,
+          questCount: campaign._count?.quests || 0,
+          encounterCount: campaign._count?.encounters || 0,
+          chronicleCount: campaign._count?.chronicles || 0
         }
       }
     } catch (error) {
@@ -192,32 +131,17 @@ export class CampaignRepository {
    */
   async update(data: UpdateCampaignInput): Promise<Campaign> {
     try {
-      const client = await db()
-      const campaignModel = (client as unknown as { campaign: unknown }).campaign as {
-        update(args: {
-          where: { id: string }
-          data: {
-            name?: string
-            description?: string
-            coverImagePath?: string
-            settings?: unknown
-            lastPlayedAt?: Date
-          }
-        }): Promise<unknown>
-      }
-
-      const campaign = await campaignModel.update({
+      const campaign = await this.prisma.campaign.update({
         where: { id: data.id },
         data: {
           name: data.name,
           description: data.description,
           coverImagePath: data.coverImagePath,
-          settings: data.settings,
           lastPlayedAt: data.lastPlayedAt
         }
       })
 
-      return campaign as Campaign
+      return campaign
     } catch (error) {
       if (isPrismaError(error)) {
         if (error.code === 'P2025') {
@@ -236,15 +160,8 @@ export class CampaignRepository {
    */
   async delete(id: string): Promise<void> {
     try {
-      const client = await db()
-      const campaignModel = (client as unknown as { campaign: unknown }).campaign as {
-        delete(args: {
-          where: { id: string }
-        }): Promise<unknown>
-      }
-
       // Prisma will handle cascade deletes for related entities
-      await campaignModel.delete({
+      await this.prisma.campaign.delete({
         where: { id }
       })
     } catch (error) {
@@ -260,24 +177,14 @@ export class CampaignRepository {
    */
   async updateLastPlayed(id: string): Promise<Campaign> {
     try {
-      const client = await db()
-      const campaignModel = (client as unknown as { campaign: unknown }).campaign as {
-        update(args: {
-          where: { id: string }
-          data: {
-            lastPlayedAt: Date
-          }
-        }): Promise<unknown>
-      }
-
-      const campaign = await campaignModel.update({
+      const campaign = await this.prisma.campaign.update({
         where: { id },
         data: {
           lastPlayedAt: new Date()
         }
       })
 
-      return campaign as Campaign
+      return campaign
     } catch (error) {
       if (isPrismaError(error) && error.code === 'P2025') {
         throw new Error(`Campaign with ID "${id}" not found`)
@@ -291,17 +198,7 @@ export class CampaignRepository {
    */
   async nameExists(name: string, excludeId?: string): Promise<boolean> {
     try {
-      const client = await db()
-      const campaignModel = (client as unknown as { campaign: unknown }).campaign as {
-        findFirst(args: {
-          where: {
-            name: string
-            id?: { not: string }
-          }
-        }): Promise<unknown | null>
-      }
-
-      const campaign = await campaignModel.findFirst({
+      const campaign = await this.prisma.campaign.findFirst({
         where: {
           name,
           ...(excludeId && { id: { not: excludeId } })
@@ -319,25 +216,7 @@ export class CampaignRepository {
    */
   async getStatistics(id: string): Promise<CampaignWithStats['stats'] | null> {
     try {
-      const client = await db()
-      const campaignModel = (client as unknown as { campaign: unknown }).campaign as {
-        findUnique(args: {
-          where: { id: string }
-          include: {
-            _count: {
-              select: {
-                npcs: boolean
-                locations: boolean
-                quests: boolean
-                encounters: boolean
-                chronicles: boolean
-              }
-            }
-          }
-        }): Promise<unknown | null>
-      }
-
-      const campaign = await campaignModel.findUnique({
+      const campaign = await this.prisma.campaign.findUnique({
         where: { id },
         include: {
           _count: {
@@ -356,13 +235,12 @@ export class CampaignRepository {
         return null
       }
 
-      const typedCampaign = campaign as CampaignWithCount
       return {
-        npcCount: typedCampaign._count?.npcs || 0,
-        locationCount: typedCampaign._count?.locations || 0,
-        questCount: typedCampaign._count?.quests || 0,
-        encounterCount: typedCampaign._count?.encounters || 0,
-        chronicleCount: typedCampaign._count?.chronicles || 0
+        npcCount: campaign._count?.npcs || 0,
+        locationCount: campaign._count?.locations || 0,
+        questCount: campaign._count?.quests || 0,
+        encounterCount: campaign._count?.encounters || 0,
+        chronicleCount: campaign._count?.chronicles || 0
       }
     } catch (error) {
       throw error

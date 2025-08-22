@@ -1,51 +1,65 @@
 // Singleton PrismaClient for DM's Codex
 // Ensures single database connection across the application
 
-import path from 'path'
+import { PrismaClient } from './generated/prisma'
 import { app } from 'electron'
-
-// Simple interface for what we need from the database client
-interface DatabaseClient {
-  $connect(): Promise<void>
-  $disconnect(): Promise<void>
-  $queryRaw(query: TemplateStringsArray): Promise<unknown>
-  [key: string]: unknown // Allow for dynamic properties like 'campaign'
-}
+import path from 'path'
+import fs from 'fs-extra'
 
 // Module-level variables for the singleton
-let prismaInstance: DatabaseClient | null = null
+let prismaClient: PrismaClient | null = null
 
-async function createPrismaInstance(): Promise<DatabaseClient> {
-  // Dynamically import and create PrismaClient
-  const { PrismaClient } = await import('./generated/prisma/index.js')
-  
-  // Get the correct database path based on environment
-  const isDev = process.env.NODE_ENV === 'development'
-  
-  let databasePath: string
-  if (isDev) {
-    // In development, use relative path from the project root
-    databasePath = path.join(process.cwd(), 'data', 'database.db')
-  } else {
-    // In production, use userData directory
-    const userDataPath = app.getPath('userData')
-    databasePath = path.join(userDataPath, 'data', 'database.db')
+export const getPrismaClient = async (): Promise<PrismaClient> => {
+  if (!prismaClient) {
+    // Get the correct database path based on environment
+    const isDev = process.env.NODE_ENV === 'development'
+    
+    let databasePath: string
+    let dataDir: string
+    
+    if (isDev) {
+      // In development, use relative path from the project root
+      dataDir = path.join(process.cwd(), 'data')
+      databasePath = path.join(dataDir, 'database.db')
+    } else {
+      // In production, use userData directory
+      const userDataPath = app.getPath('userData')
+      dataDir = path.join(userDataPath, 'data')
+      databasePath = path.join(dataDir, 'database.db')
+    }
+
+    // Create data directory if it doesn't exist
+    await fs.ensureDir(dataDir)
+
+    // Ensure the path uses forward slashes for SQLite URL
+    const databaseUrl = `file:${databasePath.replace(/\\/g, '/')}`
+
+    prismaClient = new PrismaClient({
+      datasources: {
+        db: {
+          url: databaseUrl
+        }
+      },
+      log: isDev ? ['query', 'info', 'warn', 'error'] : ['error']
+    })
+
+    // Handle graceful shutdown
+    process.on('beforeExit', async () => {
+      await DatabaseManager.disconnect()
+    })
+
+    process.on('SIGINT', async () => {
+      await DatabaseManager.disconnect()
+      process.exit(0)
+    })
+
+    process.on('SIGTERM', async () => {
+      await DatabaseManager.disconnect()
+      process.exit(0)
+    })
   }
 
-  // Ensure the path uses forward slashes for SQLite URL
-  const databaseUrl = `file:${databasePath.replace(/\\/g, '/')}`
-
-  const client = new PrismaClient({
-    datasources: {
-      db: {
-        url: databaseUrl
-      }
-    },
-    log: isDev ? ['query', 'info', 'warn', 'error'] : ['error']
-  })
-
-  // Return as our interface type
-  return client as unknown as DatabaseClient
+  return prismaClient
 }
 
 export class DatabaseManager {
@@ -53,27 +67,8 @@ export class DatabaseManager {
 
   private constructor() {}
 
-  public static async getInstance(): Promise<DatabaseClient> {
-    if (!prismaInstance) {
-      prismaInstance = await createPrismaInstance()
-
-      // Handle graceful shutdown
-      process.on('beforeExit', async () => {
-        await DatabaseManager.disconnect()
-      })
-
-      process.on('SIGINT', async () => {
-        await DatabaseManager.disconnect()
-        process.exit(0)
-      })
-
-      process.on('SIGTERM', async () => {
-        await DatabaseManager.disconnect()
-        process.exit(0)
-      })
-    }
-
-    return prismaInstance
+  public static async getInstance(): Promise<PrismaClient> {
+    return await getPrismaClient()
   }
 
   public static async connect(): Promise<void> {
@@ -82,7 +77,7 @@ export class DatabaseManager {
     }
 
     try {
-      const client = await DatabaseManager.getInstance()
+      const client = await getPrismaClient()
       await client.$connect()
       DatabaseManager.isConnected = true
       console.log('✅ Database connected successfully')
@@ -93,14 +88,14 @@ export class DatabaseManager {
   }
 
   public static async disconnect(): Promise<void> {
-    if (!prismaInstance || !DatabaseManager.isConnected) {
+    if (!prismaClient || !DatabaseManager.isConnected) {
       return
     }
 
     try {
-      await prismaInstance.$disconnect()
+      await prismaClient.$disconnect()
       DatabaseManager.isConnected = false
-      prismaInstance = null // Reset instance for clean restart
+      prismaClient = null
       console.log('✅ Database disconnected successfully')
     } catch (error) {
       console.error('❌ Failed to disconnect from database:', error)
@@ -110,7 +105,7 @@ export class DatabaseManager {
 
   public static async healthCheck(): Promise<boolean> {
     try {
-      const client = await DatabaseManager.getInstance()
+      const client = await getPrismaClient()
       await client.$queryRaw`SELECT 1`
       return true
     } catch (error) {
@@ -120,12 +115,9 @@ export class DatabaseManager {
   }
 
   public static isReady(): boolean {
-    return DatabaseManager.isConnected && prismaInstance !== null
+    return DatabaseManager.isConnected && prismaClient !== null
   }
 }
 
 // Export singleton instance getter
-export const db = (): Promise<DatabaseClient> => DatabaseManager.getInstance()
-
-// Export utility functions
-export { DatabaseManager as DatabaseClient }
+export const db = (): Promise<PrismaClient> => getPrismaClient()

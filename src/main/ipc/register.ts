@@ -2,7 +2,7 @@
 // Manages registration and unregistration of all IPC handlers
 
 import { registerCampaignHandlers, unregisterCampaignHandlers } from './handlers/campaignHandlers'
-import { DatabaseClient } from '../database/client'
+import { DatabaseManager } from '../database/client'
 
 export class IpcRegistry {
   private static isRegistered = false
@@ -20,7 +20,7 @@ export class IpcRegistry {
       console.log('🔧 Registering IPC handlers...')
 
       // Ensure database connection is established
-      await DatabaseClient.connect()
+      await DatabaseManager.connect()
 
       // Register all handler modules
       registerCampaignHandlers()
@@ -61,7 +61,7 @@ export class IpcRegistry {
       // etc.
 
       // Disconnect database
-      await DatabaseClient.disconnect()
+      await DatabaseManager.disconnect()
 
       IpcRegistry.isRegistered = false
       console.log('✅ All IPC handlers unregistered successfully')
@@ -75,7 +75,7 @@ export class IpcRegistry {
    * Check if handlers are registered
    */
   static isReady(): boolean {
-    return IpcRegistry.isRegistered && DatabaseClient.isReady()
+    return IpcRegistry.isRegistered && DatabaseManager.isReady()
   }
 
   /**
@@ -87,7 +87,7 @@ export class IpcRegistry {
         return false
       }
 
-      const dbHealthy = await DatabaseClient.healthCheck()
+      const dbHealthy = await DatabaseManager.healthCheck()
       if (!dbHealthy) {
         return false
       }
@@ -109,7 +109,7 @@ export class IpcRegistry {
   } {
     return {
       ipcRegistered: IpcRegistry.isRegistered,
-      databaseConnected: DatabaseClient.isReady(),
+      databaseConnected: DatabaseManager.isReady(),
       ready: IpcRegistry.isReady()
     }
   }

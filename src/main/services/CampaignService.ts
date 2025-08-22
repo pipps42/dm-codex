@@ -2,6 +2,7 @@
 // Handles validation, file system operations, and orchestrates repository calls
 
 import { CampaignRepository } from '../database/repositories/CampaignRepository'
+import { getPrismaClient } from '../database/client'
 import type { Campaign } from '../database/generated/prisma'
 import type { CreateCampaignInput, UpdateCampaignInput, CampaignWithStats } from '../../shared/types/ipc'
 import fs from 'fs-extra'
@@ -13,8 +14,7 @@ import { z } from 'zod'
 const createCampaignSchema = z.object({
   name: z.string().min(1, 'Campaign name is required').max(100, 'Campaign name must be less than 100 characters'),
   description: z.string().optional(),
-  coverImagePath: z.string().optional(),
-  settings: z.record(z.string(), z.unknown()).optional()
+  coverImagePath: z.string().optional()
 })
 
 const updateCampaignSchema = z.object({
@@ -22,15 +22,18 @@ const updateCampaignSchema = z.object({
   name: z.string().min(1, 'Campaign name is required').max(100, 'Campaign name must be less than 100 characters').optional(),
   description: z.string().optional(),
   coverImagePath: z.string().optional(),
-  settings: z.record(z.string(), z.unknown()).optional(),
   lastPlayedAt: z.date().optional()
 })
 
 export class CampaignService {
-  private repository: CampaignRepository
+  private repository: CampaignRepository | null = null
 
-  constructor() {
-    this.repository = new CampaignRepository()
+  private async getRepository(): Promise<CampaignRepository> {
+    if (!this.repository) {
+      const prisma = await getPrismaClient()
+      this.repository = new CampaignRepository(prisma)
+    }
+    return this.repository
   }
 
   /**
@@ -39,15 +42,16 @@ export class CampaignService {
   async create(data: CreateCampaignInput): Promise<Campaign> {
     // Validate input
     const validatedData = createCampaignSchema.parse(data)
+    const repository = await this.getRepository()
 
     // Check if name already exists
-    const nameExists = await this.repository.nameExists(validatedData.name)
+    const nameExists = await repository.nameExists(validatedData.name)
     if (nameExists) {
       throw new Error(`Campaign with name "${validatedData.name}" already exists`)
     }
 
     // Create campaign in database
-    const campaign = await this.repository.create(validatedData)
+    const campaign = await repository.create(validatedData)
 
     // Create campaign folder structure
     try {
@@ -55,7 +59,7 @@ export class CampaignService {
     } catch (error) {
       // If folder creation fails, cleanup the database entry
       try {
-        await this.repository.delete(campaign.id)
+        await repository.delete(campaign.id)
       } catch (cleanupError) {
         console.error('Failed to cleanup campaign after folder creation error:', cleanupError)
       }
@@ -69,7 +73,8 @@ export class CampaignService {
    * Find all campaigns with statistics
    */
   async findAll(): Promise<CampaignWithStats[]> {
-    return await this.repository.findAll()
+    const repository = await this.getRepository()
+    return await repository.findAll()
   }
 
   /**
@@ -80,7 +85,8 @@ export class CampaignService {
       throw new Error('Invalid campaign ID format')
     }
 
-    return await this.repository.findById(id)
+    const repository = await this.getRepository()
+    return await repository.findById(id)
   }
 
   /**
@@ -89,23 +95,24 @@ export class CampaignService {
   async update(data: UpdateCampaignInput): Promise<Campaign> {
     // Validate input
     const validatedData = updateCampaignSchema.parse(data)
+    const repository = await this.getRepository()
 
     // Check if campaign exists
-    const existingCampaign = await this.repository.findById(validatedData.id)
+    const existingCampaign = await repository.findById(validatedData.id)
     if (!existingCampaign) {
       throw new Error(`Campaign with ID "${validatedData.id}" not found`)
     }
 
     // Check if name conflicts with other campaigns
     if (validatedData.name && validatedData.name !== existingCampaign.name) {
-      const nameExists = await this.repository.nameExists(validatedData.name, validatedData.id)
+      const nameExists = await repository.nameExists(validatedData.name, validatedData.id)
       if (nameExists) {
         throw new Error(`Campaign with name "${validatedData.name}" already exists`)
       }
     }
 
     // Update campaign
-    return await this.repository.update(validatedData)
+    return await repository.update(validatedData)
   }
 
   /**
@@ -116,14 +123,16 @@ export class CampaignService {
       throw new Error('Invalid campaign ID format')
     }
 
+    const repository = await this.getRepository()
+
     // Check if campaign exists
-    const campaign = await this.repository.findById(id)
+    const campaign = await repository.findById(id)
     if (!campaign) {
       throw new Error(`Campaign with ID "${id}" not found`)
     }
 
     // Delete from database first
-    await this.repository.delete(id)
+    await repository.delete(id)
 
     // Then cleanup folders
     try {
@@ -142,7 +151,8 @@ export class CampaignService {
       throw new Error('Invalid campaign ID format')
     }
 
-    return await this.repository.updateLastPlayed(id)
+    const repository = await this.getRepository()
+    return await repository.updateLastPlayed(id)
   }
 
   /**
@@ -220,8 +230,10 @@ This folder contains all data files for this campaign.
       throw new Error('Invalid campaign ID format')
     }
 
+    const repository = await this.getRepository()
+
     // Check if campaign exists
-    const campaign = await this.repository.findById(campaignId)
+    const campaign = await repository.findById(campaignId)
     if (!campaign) {
       throw new Error(`Campaign with ID "${campaignId}" not found`)
     }
@@ -240,7 +252,7 @@ This folder contains all data files for this campaign.
     await fs.copy(sourcePath, destPath, { overwrite: true })
 
     // Update campaign with new cover path
-    await this.repository.update({
+    await repository.update({
       id: campaignId,
       coverImagePath: destPath
     })
@@ -256,8 +268,10 @@ This folder contains all data files for this campaign.
       throw new Error('Invalid campaign ID format')
     }
 
+    const repository = await this.getRepository()
+
     // Get campaign to check current cover
-    const campaign = await this.repository.findById(campaignId)
+    const campaign = await repository.findById(campaignId)
     if (!campaign) {
       throw new Error(`Campaign with ID "${campaignId}" not found`)
     }
@@ -268,7 +282,7 @@ This folder contains all data files for this campaign.
     }
 
     // Update campaign to remove cover path
-    await this.repository.update({
+    await repository.update({
       id: campaignId,
       coverImagePath: undefined
     })
