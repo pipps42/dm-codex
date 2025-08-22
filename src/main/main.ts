@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import os from 'node:os'
 import { UpdateService } from './services/UpdateService'
+import { registerIpcHandlers, unregisterIpcHandlers, getIpcStatus } from './ipc/register'
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -46,7 +47,7 @@ const indexHtml = path.join(RENDERER_DIST, 'index.html')
 async function createWindow() {
   win = new BrowserWindow({
     title: "DM's Codex",
-    icon: path.join(process.env.VITE_PUBLIC, 'favicon.ico'),
+    icon: path.join(process.env.VITE_PUBLIC || '', 'favicon.ico'),
     width: 1200,
     height: 800,
     minWidth: 800,
@@ -76,11 +77,31 @@ async function createWindow() {
   updateService.initialize(win)
 }
 
-app.whenReady().then(createWindow)
+app.whenReady().then(async () => {
+  try {
+    // Register IPC handlers before creating the window
+    await registerIpcHandlers()
+    console.log('✅ IPC system initialized:', getIpcStatus())
+    
+    // Create the main window
+    await createWindow()
+  } catch (error) {
+    console.error('❌ Failed to initialize application:', error)
+    app.quit()
+  }
+})
 
-app.on('window-all-closed', () => {
+app.on('window-all-closed', async () => {
   win = null
-  if (process.platform !== 'darwin') app.quit()
+  if (process.platform !== 'darwin') {
+    // Cleanup IPC handlers before quitting
+    try {
+      await unregisterIpcHandlers()
+    } catch (error) {
+      console.error('❌ Failed to cleanup IPC handlers:', error)
+    }
+    app.quit()
+  }
 })
 
 app.on('second-instance', () => {
@@ -90,11 +111,21 @@ app.on('second-instance', () => {
   }
 })
 
-app.on('activate', () => {
+app.on('activate', async () => {
   const allWindows = BrowserWindow.getAllWindows()
   if (allWindows.length) {
     allWindows[0].focus()
   } else {
-    createWindow()
+    await createWindow()
+  }
+})
+
+// Graceful shutdown handling
+app.on('before-quit', async () => {
+  try {
+    await unregisterIpcHandlers()
+    console.log('✅ Application shutdown complete')
+  } catch (error) {
+    console.error('❌ Error during shutdown:', error)
   }
 })

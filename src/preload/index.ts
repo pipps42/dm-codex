@@ -1,6 +1,64 @@
 import { ipcRenderer, contextBridge } from 'electron'
+import type {
+  IpcChannels,
+  IpcChannelName,
+  IpcChannelInput,
+  IpcChannelOutput,
+  IpcResult,
+  CreateCampaignInput,
+  UpdateCampaignInput,
+  CampaignWithStats
+} from '../shared/types/ipc'
+import type { Campaign } from '../main/database/generated/prisma'
 
-// --------- Expose some API to the Renderer process ---------
+// Type-safe IPC invoke function
+async function invokeIpc<T extends IpcChannelName>(
+  channel: T,
+  input: IpcChannelInput<T>
+): Promise<IpcResult<IpcChannelOutput<T>>> {
+  return await ipcRenderer.invoke(channel, input)
+}
+
+// Campaign API - Type-safe wrapper for campaign operations
+const campaignApi = {
+  async create(input: CreateCampaignInput): Promise<IpcResult<Campaign>> {
+    return invokeIpc('campaign:create', input)
+  },
+
+  async findAll(): Promise<IpcResult<CampaignWithStats[]>> {
+    return invokeIpc('campaign:findAll', undefined)
+  },
+
+  async findById(id: string): Promise<IpcResult<CampaignWithStats | null>> {
+    return invokeIpc('campaign:findById', { id })
+  },
+
+  async update(input: UpdateCampaignInput): Promise<IpcResult<Campaign>> {
+    return invokeIpc('campaign:update', input)
+  },
+
+  async delete(id: string): Promise<IpcResult<void>> {
+    return invokeIpc('campaign:delete', { id })
+  },
+
+  async updateLastPlayed(id: string): Promise<IpcResult<Campaign>> {
+    return invokeIpc('campaign:updateLastPlayed', { id })
+  }
+}
+
+// --------- Expose DM's Codex API to the Renderer process ---------
+contextBridge.exposeInMainWorld('dmCodex', {
+  // Campaign operations
+  campaign: campaignApi,
+
+  // TODO: Add other entity APIs as they are implemented
+  // npc: npcApi,
+  // location: locationApi,
+  // quest: questApi,
+  // etc.
+})
+
+// --------- Expose limited IpcRenderer for non-API communications ---------
 contextBridge.exposeInMainWorld('ipcRenderer', {
   on(...args: Parameters<typeof ipcRenderer.on>) {
     const [channel, listener] = args
