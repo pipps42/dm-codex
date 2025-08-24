@@ -1,3 +1,5 @@
+const plugin = require('tailwindcss/plugin')
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -7,38 +9,39 @@ export default {
   theme: {
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        // Steel Blue & Slate Palette - Plugin injection
+        border: "#374151",         // Slate 600
+        input: "#1f2937",          // Gray 800  
+        ring: "#3b82f6",           // Blue 500
+        background: "#0a0a0a",     // Deep black - PLUGIN FORCED
+        foreground: "#ffffff",     // Pure white
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#3b82f6",      // Steel Blue 500
+          foreground: "#ffffff",   // White
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "#374151",      // Slate 600
+          foreground: "#f9fafb",   // Very light
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: "#dc2626",      // Red 600
+          foreground: "#ffffff",   // White
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "#374151",      // Slate 600
+          foreground: "#9ca3af",   // Gray 400
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "#60a5fa",      // Steel Blue 400 (lighter)
+          foreground: "#0f172a",   // Dark slate
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: "#262626",      // Charcoal
+          foreground: "#e5e7eb",   // Light grey
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "#262626",      // Charcoal - PLUGIN FORCED
+          foreground: "#e5e7eb",   // Light grey
         },
       },
       fontFamily: {
@@ -79,5 +82,39 @@ export default {
   corePlugins: {
     preflight: false,
   },
-  plugins: [],
+  plugins: [
+    // Plugin per forzare i colori Steel Blue & Slate
+    plugin(function({ addBase, addUtilities }) {
+      // Inietta CSS base con !important
+      addBase({
+        'body': {
+          'background-color': '#0a0a0a !important',
+          'color': '#ffffff !important',
+        },
+        // Forza i colori delle utility classes
+        '.bg-background': {
+          'background-color': '#0a0a0a !important',
+        },
+        '.bg-card': {
+          'background-color': '#262626 !important',
+        },
+        '.bg-primary': {
+          'background-color': '#3b82f6 !important',
+        },
+        '.text-foreground': {
+          'color': '#ffffff !important',
+        },
+        '.text-card-foreground': {
+          'color': '#e5e7eb !important',
+        },
+      })
+      
+      // Utility classes aggiuntive se necessario
+      addUtilities({
+        '.debug-bg': {
+          'background-color': '#ff0000 !important', // Rosso per debug
+        }
+      })
+    })
+  ],
 }

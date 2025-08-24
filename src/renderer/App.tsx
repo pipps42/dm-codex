@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import './styles/globals.css'
 import './App.css'
 import ComponentsDemo from './pages/ComponentsDemo'
 import { Button } from './components/ui'
@@ -9,6 +8,17 @@ type Page = 'home' | 'components'
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home')
+
+  useEffect(() => {
+    // Debug temporaneo per verificare @layer base
+    console.log('=== @LAYER BASE TEST ===');
+    const testDiv = document.createElement('div');
+    testDiv.className = 'bg-background';
+    document.body.appendChild(testDiv);
+    const bgColor = getComputedStyle(testDiv).backgroundColor;
+    console.log('bg-background with @layer base:', bgColor);
+    document.body.removeChild(testDiv);
+  }, []);
 
   useEffect(() => {
     const handleHashChange = () => {

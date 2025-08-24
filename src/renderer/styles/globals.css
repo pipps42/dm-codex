@@ -4,50 +4,50 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Force refresh - Steel Blue Palette Update */
+@layer base {
+  :root {
+    /* Steel Blue & Slate Dark Palette */
+    --background: 10 10 10;           /* #0a0a0a - Deep black */
+    --foreground: 255 255 255;        /* #ffffff - Pure white text */
+    
+    --card: 38 38 38;                 /* #262626 - Charcoal cards */
+    --card-foreground: 229 231 235;   /* #e5e7eb - Light grey text */
+    
+    --popover: 38 38 38;              /* #262626 - Same as cards */
+    --popover-foreground: 229 231 235; /* #e5e7eb */
+    
+    --primary: 59 130 246;            /* #3b82f6 - Steel Blue 500 */
+    --primary-foreground: 255 255 255; /* #ffffff - White text on blue */
+    
+    --secondary: 55 65 81;            /* #374151 - Slate 600 */
+    --secondary-foreground: 249 250 251; /* #f9fafb - Very light text */
+    
+    --muted: 55 65 81;                /* #374151 - Slate 600 */
+    --muted-foreground: 156 163 175;  /* #9ca3af - Grey 400 */
+    
+    --accent: 96 165 250;             /* #60a5fa - Steel Blue 400 (lighter) */
+    --accent-foreground: 15 23 42;    /* #0f172a - Dark slate */
+    
+    --destructive: 220 38 38;         /* #dc2626 - Red 600 */
+    --destructive-foreground: 255 255 255; /* #ffffff - White text */
+    
+    --border: 55 65 81;               /* #374151 - Slate 600 borders */
+    --input: 31 41 55;                /* #1f2937 - Darker input bg */
+    --ring: 59 130 246;               /* #3b82f6 - Steel Blue focus ring */
+    
+    /* Radius */
+    --radius: 0.5rem;
+  }
 
-:root {
-  /* Steel Blue & Slate Dark Palette */
-  --background: 10 10 10;           /* #0a0a0a - Deep black */
-  --foreground: 255 255 255;        /* #ffffff - Pure white text */
-  
-  --card: 38 38 38;                 /* #262626 - Charcoal cards */
-  --card-foreground: 229 231 235;   /* #e5e7eb - Light grey text */
-  
-  --popover: 38 38 38;              /* #262626 - Same as cards */
-  --popover-foreground: 229 231 235; /* #e5e7eb */
-  
-  --primary: 59 130 246;            /* #3b82f6 - Steel Blue 500 */
-  --primary-foreground: 255 255 255; /* #ffffff - White text on blue */
-  
-  --secondary: 55 65 81;            /* #374151 - Slate 600 */
-  --secondary-foreground: 249 250 251; /* #f9fafb - Very light text */
-  
-  --muted: 55 65 81;                /* #374151 - Slate 600 */
-  --muted-foreground: 156 163 175;  /* #9ca3af - Grey 400 */
-  
-  --accent: 96 165 250;             /* #60a5fa - Steel Blue 400 (lighter) */
-  --accent-foreground: 15 23 42;    /* #0f172a - Dark slate */
-  
-  --destructive: 220 38 38;         /* #dc2626 - Red 600 */
-  --destructive-foreground: 255 255 255; /* #ffffff - White text */
-  
-  --border: 55 65 81;               /* #374151 - Slate 600 borders */
-  --input: 31 41 55;                /* #1f2937 - Darker input bg */
-  --ring: 59 130 246;               /* #3b82f6 - Steel Blue focus ring */
-  
-  /* Radius */
-  --radius: 0.5rem;
-}
+  * {
+    border-color: hsl(var(--border));
+  }
 
-* {
-  border-color: hsl(var(--border));
-}
-
-body {
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
-  font-family: 'Inter', sans-serif;
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Inter', sans-serif;
+  }
 }
 
 /* Fantasy Typography */
