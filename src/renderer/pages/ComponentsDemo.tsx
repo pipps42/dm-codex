@@ -1,4 +1,7 @@
 import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
 import { 
   Button, 
   Input, 
@@ -9,7 +12,24 @@ import {
   CardDescription, 
   CardContent,
   CardFooter,
-  Separator
+  Separator,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Checkbox,
+  RadioGroup,
+  RadioGroupItem,
+  Textarea,
+  Switch,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
 } from '../components/ui'
 import { 
   Sword, 
@@ -341,6 +361,108 @@ export default function ComponentsDemo() {
           </Card>
         </section>
 
+        {/* Forms Section */}
+        <section className="space-y-6">
+          <h2 className="text-2xl font-semibold font-fantasy">Form Components</h2>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Basic Form Controls */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Basic Form Controls</CardTitle>
+                <CardDescription>Componenti base per la creazione di form</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Select */}
+                <div className="space-y-2">
+                  <Label htmlFor="character-class">Classe Personaggio</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleziona una classe" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="fighter">Guerriero</SelectItem>
+                      <SelectItem value="wizard">Mago</SelectItem>
+                      <SelectItem value="rogue">Ladro</SelectItem>
+                      <SelectItem value="cleric">Chierico</SelectItem>
+                      <SelectItem value="ranger">Ranger</SelectItem>
+                      <SelectItem value="barbarian">Barbaro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Textarea */}
+                <div className="space-y-2">
+                  <Label htmlFor="character-background">Background</Label>
+                  <Textarea 
+                    id="character-background"
+                    placeholder="Descrivi la storia del tuo personaggio..."
+                    className="min-h-[100px]"
+                  />
+                </div>
+
+                {/* Switch */}
+                <div className="flex items-center space-x-2">
+                  <Switch id="multiclass" />
+                  <Label htmlFor="multiclass">Personaggio multiclasse</Label>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Checkboxes and Radio Groups */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Selection Controls</CardTitle>
+                <CardDescription>Controlli per selezioni singole e multiple</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Checkboxes */}
+                <div className="space-y-3">
+                  <Label>Competenze (multipla selezione)</Label>
+                  <div className="space-y-2">
+                    {['Acrobazia', 'Arcano', 'Atletica', 'Inganno', 'Storia'].map((skill) => (
+                      <div key={skill} className="flex items-center space-x-2">
+                        <Checkbox id={skill.toLowerCase()} />
+                        <Label htmlFor={skill.toLowerCase()}>{skill}</Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Radio Group */}
+                <div className="space-y-3">
+                  <Label>Allineamento (selezione singola)</Label>
+                  <RadioGroup defaultValue="neutral">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="good" id="good" />
+                      <Label htmlFor="good">Buono</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="neutral" id="neutral" />
+                      <Label htmlFor="neutral">Neutrale</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="evil" id="evil" />
+                      <Label htmlFor="evil">Malvagio</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Complete Form Example */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Complete Form Example</CardTitle>
+              <CardDescription>Esempio di form completo con react-hook-form e validazione</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CharacterFormExample />
+            </CardContent>
+          </Card>
+        </section>
+
         {/* Footer */}
         <div className="text-center pt-12 pb-6">
           <Separator variant="decorative" className="mb-6" />
@@ -350,5 +472,248 @@ export default function ComponentsDemo() {
         </div>
       </div>
     </div>
+  )
+}
+
+const characterSchema = z.object({
+  name: z.string().min(2, { message: "Il nome deve avere almeno 2 caratteri" }),
+  class: z.string({ required_error: "Seleziona una classe" }),
+  level: z.coerce.number().min(1).max(20, { message: "Il livello deve essere tra 1 e 20" }),
+  background: z.string().min(10, { message: "Il background deve avere almeno 10 caratteri" }),
+  multiclass: z.boolean(),
+  skills: z.array(z.string()).min(1, { message: "Seleziona almeno una competenza" }),
+  alignment: z.string({ required_error: "Seleziona un allineamento" })
+})
+
+type CharacterFormValues = z.infer<typeof characterSchema>
+
+function CharacterFormExample() {
+  const form = useForm<CharacterFormValues>({
+    resolver: zodResolver(characterSchema),
+    defaultValues: {
+      multiclass: false,
+      skills: [],
+      alignment: "neutral"
+    }
+  })
+
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([])
+
+  const onSubmit = (values: CharacterFormValues) => {
+    console.log(values)
+  }
+
+  const handleSkillChange = (skill: string, checked: boolean) => {
+    const newSkills = checked 
+      ? [...selectedSkills, skill]
+      : selectedSkills.filter(s => s !== skill)
+    setSelectedSkills(newSkills)
+    form.setValue('skills', newSkills)
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Name */}
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nome Personaggio</FormLabel>
+                <FormControl>
+                  <Input placeholder="Es. Aragorn" {...field} />
+                </FormControl>
+                <FormDescription>
+                  Il nome del tuo personaggio
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Class */}
+          <FormField
+            control={form.control}
+            name="class"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Classe</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleziona classe" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="fighter">Guerriero</SelectItem>
+                    <SelectItem value="wizard">Mago</SelectItem>
+                    <SelectItem value="rogue">Ladro</SelectItem>
+                    <SelectItem value="cleric">Chierico</SelectItem>
+                    <SelectItem value="ranger">Ranger</SelectItem>
+                    <SelectItem value="barbarian">Barbaro</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Level */}
+          <FormField
+            control={form.control}
+            name="level"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Livello</FormLabel>
+                <FormControl>
+                  <Input type="number" min="1" max="20" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Multiclass Switch */}
+          <FormField
+            control={form.control}
+            name="multiclass"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-base">
+                    Multiclasse
+                  </FormLabel>
+                  <FormDescription>
+                    Abilita se il personaggio ha più classi
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Background Textarea */}
+        <FormField
+          control={form.control}
+          name="background"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Background</FormLabel>
+              <FormControl>
+                <Textarea 
+                  placeholder="Descrivi la storia e le motivazioni del personaggio..."
+                  className="min-h-[120px]"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                Una breve storia del personaggio e delle sue motivazioni
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Skills Checkboxes */}
+        <FormField
+          control={form.control}
+          name="skills"
+          render={() => (
+            <FormItem>
+              <div className="mb-4">
+                <FormLabel className="text-base">Competenze</FormLabel>
+                <FormDescription>
+                  Seleziona le competenze del personaggio
+                </FormDescription>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {['Acrobazia', 'Arcano', 'Atletica', 'Inganno', 'Storia', 'Medicina'].map((skill) => (
+                  <FormField
+                    key={skill}
+                    control={form.control}
+                    name="skills"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={selectedSkills.includes(skill)}
+                            onCheckedChange={(checked) => handleSkillChange(skill, checked as boolean)}
+                          />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          {skill}
+                        </FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                ))}
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Alignment Radio Group */}
+        <FormField
+          control={form.control}
+          name="alignment"
+          render={({ field }) => (
+            <FormItem className="space-y-3">
+              <FormLabel>Allineamento</FormLabel>
+              <FormControl>
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  className="flex flex-col space-y-1"
+                >
+                  <FormItem className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="good" />
+                    </FormControl>
+                    <FormLabel className="font-normal">
+                      Buono
+                    </FormLabel>
+                  </FormItem>
+                  <FormItem className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="neutral" />
+                    </FormControl>
+                    <FormLabel className="font-normal">
+                      Neutrale
+                    </FormLabel>
+                  </FormItem>
+                  <FormItem className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="evil" />
+                    </FormControl>
+                    <FormLabel className="font-normal">
+                      Malvagio
+                    </FormLabel>
+                  </FormItem>
+                </RadioGroup>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="flex gap-4">
+          <Button type="submit">
+            Crea Personaggio
+          </Button>
+          <Button type="button" variant="outline" onClick={() => form.reset()}>
+            Reset Form
+          </Button>
+        </div>
+      </form>
+    </Form>
   )
 }
