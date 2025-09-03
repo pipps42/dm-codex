@@ -10,8 +10,8 @@ export default {
     extend: {
       colors: {
         // Steel Blue & Slate Dark Theme
-        background: '#0a0a0a',     // Deep black
-        foreground: '#ffffff',     // Pure white text
+        background: '#0f1419',     // Softer dark (dark slate)
+        foreground: '#f8fafc',     // Off-white (slate 50)
         
         card: {
           DEFAULT: '#262626',      // Charcoal cards

@@ -12,11 +12,11 @@ export interface ButtonProps
 
 const buttonVariants = {
   variant: {
-    default: "bg-primary text-primary-foreground hover:bg-primary/90",
-    secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-    destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-    ghost: "hover:bg-accent hover:text-accent-foreground",
-    outline: "border border-input bg-transparent hover:bg-accent hover:text-accent-foreground",
+    default: "bg-primary text-primary-foreground hover:bg-primary/80",
+    secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/70",
+    destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/80",
+    ghost: "text-foreground hover:text-primary",
+    outline: "border-2 border-border bg-transparent text-foreground hover:bg-accent/10 hover:border-primary",
   },
   size: {
     sm: "h-8 px-3 text-sm",
@@ -41,9 +41,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           // Base styles
           "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md",
-          "font-medium transition-colors duration-150",
+          "font-medium transition-all duration-150",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
           "disabled:pointer-events-none disabled:opacity-50",
+          // Click effect - same for all buttons
+          "active:scale-95 active:brightness-90",
           // Variant styles
           buttonVariants.variant[variant],
           // Size styles
