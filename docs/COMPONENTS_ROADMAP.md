@@ -14,32 +14,32 @@ Costruire un sistema di componenti completo e coerente per DM's Codex, procedend
 - [x] Separator
 - [x] Pagina ComponentsDemo
 
-### 📦 Fase 2: Form Components
+### ✅ Fase 2: Form Components (Completata)
 **Prompt**: "Implementa i componenti form basandoti sul design system esistente"
 
-Componenti da creare:
-- **Select** (con Radix UI)
-- **Checkbox** (con Radix UI)
-- **RadioGroup** (con Radix UI)
-- **Textarea**
-- **Switch** (con Radix UI)
-- **Form** (wrapper con react-hook-form)
-- **FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage**
+Componenti completati:
+- [x] **Select** (con Radix UI)
+- [x] **Checkbox** (con Radix UI)
+- [x] **RadioGroup** (con Radix UI)
+- [x] **Textarea**
+- [x] **Switch** (con Radix UI)
+- [x] **Form** (wrapper con react-hook-form)
+- [x] **FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage**
 
 Update ComponentsDemo con sezione Forms.
 
-### 📦 Fase 3: Feedback & Overlay Components
+### ✅ Fase 3: Feedback & Overlay Components (Completata)
 **Prompt**: "Implementa componenti per feedback e overlay"
 
-Componenti:
-- **Dialog** (con Radix UI)
-- **AlertDialog** (con Radix UI)
-- **Toast** (configurazione Sonner)
-- **Tooltip** (con Radix UI)
-- **Popover** (con Radix UI)
-- **DropdownMenu** (con Radix UI)
-- **ContextMenu** (con Radix UI)
-- **Loading** (spinner/skeleton)
+Componenti completati:
+- [x] **Dialog** (con Radix UI)
+- [x] **AlertDialog** (con Radix UI)
+- [x] **Toast** (configurazione Sonner)
+- [x] **Tooltip** (con Radix UI)
+- [x] **Popover** (con Radix UI)
+- [x] **DropdownMenu** (con Radix UI)
+- [x] **ContextMenu** (con Radix UI)
+- [x] **Loading** (spinner/skeleton)
 
 ### 📦 Fase 4: Layout Components
 **Prompt**: "Implementa componenti layout per strutturare l'app"

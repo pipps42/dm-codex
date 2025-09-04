@@ -1,11 +1,12 @@
-export { Button } from './button'
-export type { ButtonProps } from './button'
+// Foundation Components
+export { Button } from './foundation/button'
+export type { ButtonProps } from './foundation/button'
 
-export { Input } from './input'
-export type { InputProps } from './input'
+export { Input } from './foundation/input'
+export type { InputProps } from './foundation/input'
 
-export { Label } from './label'
-export type { LabelProps } from './label'
+export { Label } from './foundation/label'
+export type { LabelProps } from './foundation/label'
 
 export { 
   Card,
@@ -14,10 +15,11 @@ export {
   CardTitle,
   CardDescription,
   CardContent
-} from './card'
+} from './foundation/card'
 
-export { Separator } from './separator'
+export { Separator } from './foundation/separator'
 
+// Form Components
 export {
   Select,
   SelectGroup,
@@ -27,16 +29,16 @@ export {
   SelectLabel,
   SelectItem,
   SelectSeparator,
-} from './select'
+} from './form/select'
 
-export { Checkbox } from './checkbox'
+export { Checkbox } from './form/checkbox'
 
-export { RadioGroup, RadioGroupItem } from './radio-group'
+export { RadioGroup, RadioGroupItem } from './form/radio-group'
 
-export { Textarea } from './textarea'
-export type { TextareaProps } from './textarea'
+export { Textarea } from './form/textarea'
+export type { TextareaProps } from './form/textarea'
 
-export { Switch } from './switch'
+export { Switch } from './form/switch'
 
 export {
   useFormField,
@@ -47,4 +49,89 @@ export {
   FormDescription,
   FormMessage,
   FormField,
-} from './form'
+} from './form/form'
+
+// Feedback Components
+export {
+  Dialog,
+  DialogPortal,
+  DialogOverlay,
+  DialogClose,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from './feedback/dialog'
+
+export {
+  AlertDialog,
+  AlertDialogPortal,
+  AlertDialogOverlay,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from './feedback/alert-dialog'
+
+export { showToast, toast } from './feedback/toast'
+
+export {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider
+} from './feedback/tooltip'
+
+export {
+  Popover,
+  PopoverTrigger,
+  PopoverContent
+} from './feedback/popover'
+
+export {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuGroup,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuRadioGroup,
+} from './feedback/dropdown-menu'
+
+export {
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuCheckboxItem,
+  ContextMenuRadioItem,
+  ContextMenuLabel,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+  ContextMenuGroup,
+  ContextMenuPortal,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuRadioGroup,
+} from './feedback/context-menu'
+
+export {
+  LoadingSpinner,
+  Skeleton,
+  LoadingOverlay
+} from './feedback/loading'

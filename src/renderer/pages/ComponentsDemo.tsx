@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
+import { Toaster } from 'sonner'
 import { 
   Button, 
   Input, 
@@ -29,7 +30,43 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  showToast,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+  LoadingSpinner,
+  Skeleton,
+  LoadingOverlay
 } from '../components/ui'
 import { 
   Sword, 
@@ -40,7 +77,15 @@ import {
   Mail, 
   Search,
   Settings,
-  Trash2
+  Trash2,
+  Info,
+  ChevronDown,
+  MoreHorizontal,
+  Edit,
+  Copy,
+  Star,
+  Bell,
+  HelpCircle
 } from 'lucide-react'
 
 export default function ComponentsDemo() {
@@ -64,6 +109,7 @@ export default function ComponentsDemo() {
 
   return (
     <div className="min-h-screen bg-background text-foreground p-8">
+      <Toaster richColors />
       <div className="max-w-6xl mx-auto space-y-12">
         {/* Header */}
         <div className="text-center space-y-4">
@@ -94,7 +140,8 @@ export default function ComponentsDemo() {
                   <Button loading={isLoading} onClick={handleLoadingDemo}>
                     {isLoading ? 'Casting...' : 'Cast Spell'}
                   </Button>
-                  <Button icon={<Sword className="w-4 h-4" />}>
+                  <Button>
+                    <Sword className="w-4 h-4 mr-2" />
                     Attack
                   </Button>
                   <Button disabled>Disabled</Button>
@@ -106,7 +153,8 @@ export default function ComponentsDemo() {
                 <h4 className="text-sm font-medium text-muted-foreground">Secondary Actions</h4>
                 <div className="flex flex-wrap gap-4">
                   <Button variant="secondary">Secondary</Button>
-                  <Button variant="secondary" icon={<Shield className="w-4 h-4" />}>
+                  <Button variant="secondary">
+                    <Shield className="w-4 h-4 mr-2" />
                     Defend
                   </Button>
                   <Button variant="outline">Outline</Button>
@@ -119,7 +167,8 @@ export default function ComponentsDemo() {
                 <h4 className="text-sm font-medium text-muted-foreground">Destructive Actions</h4>
                 <div className="flex flex-wrap gap-4">
                   <Button variant="destructive">Delete</Button>
-                  <Button variant="destructive" icon={<Trash2 className="w-4 h-4" />}>
+                  <Button variant="destructive">
+                    <Trash2 className="w-4 h-4 mr-2" />
                     Remove Character
                   </Button>
                 </div>
@@ -319,7 +368,8 @@ export default function ComponentsDemo() {
                 <Button variant="destructive" size="sm" className="flex-1">
                   Fine Turno
                 </Button>
-                <Button variant="outline" size="sm" icon={<Settings className="w-4 h-4" />}>
+                <Button variant="outline" size="sm">
+                  <Settings className="w-4 h-4" />
                 </Button>
               </CardFooter>
             </Card>
@@ -463,6 +513,293 @@ export default function ComponentsDemo() {
           </Card>
         </section>
 
+        {/* Feedback & Overlay Components Section */}
+        <section className="space-y-6">
+          <h2 className="text-2xl font-semibold font-fantasy">Feedback & Overlay Components</h2>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Dialogs & Modals */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Dialogs & Alerts</CardTitle>
+                <CardDescription>Modali e dialoghi per interazioni critiche</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Dialog */}
+                <div className="space-y-2">
+                  <Label>Dialog</Label>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline">Apri Dialog</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Creazione Nuovo Personaggio</DialogTitle>
+                        <DialogDescription>
+                          Compila i dati per creare un nuovo personaggio per la tua campagna.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="char-name">Nome</Label>
+                          <Input id="char-name" placeholder="Gandalf" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="char-level">Livello</Label>
+                          <Input id="char-level" type="number" placeholder="1" />
+                        </div>
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline">Annulla</Button>
+                        <Button>Crea Personaggio</Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+
+                {/* Alert Dialog */}
+                <div className="space-y-2">
+                  <Label>Alert Dialog</Label>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive">Elimina Campagna</Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Sei sicuro?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Questa azione cancellerà permanentemente la campagna e tutti i dati associati. 
+                          Non sarà possibile annullare questa operazione.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Annulla</AlertDialogCancel>
+                        <AlertDialogAction>Elimina definitivamente</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Tooltips & Popovers */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Tooltips & Popovers</CardTitle>
+                <CardDescription>Contenuto informativo contestuale</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <TooltipProvider>
+                  {/* Tooltip */}
+                  <div className="space-y-2">
+                    <Label>Tooltip</Label>
+                    <div className="flex gap-4">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <HelpCircle className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Questo pulsante serve per ottenere aiuto</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <Star className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Aggiungi ai preferiti</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </div>
+
+                  {/* Popover */}
+                  <div className="space-y-2">
+                    <Label>Popover</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline">
+                          <Info className="w-4 h-4 mr-2" />
+                          Info Incantesimo
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80">
+                        <div className="space-y-2">
+                          <h4 className="font-semibold">Fireball</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Un incantesimo di evocazione di 3° livello che crea una palla di fuoco esplosiva.
+                          </p>
+                          <div className="grid gap-2 text-sm">
+                            <div className="grid grid-cols-2">
+                              <span className="text-muted-foreground">Tempo:</span>
+                              <span>1 azione</span>
+                            </div>
+                            <div className="grid grid-cols-2">
+                              <span className="text-muted-foreground">Gittata:</span>
+                              <span>45 metri</span>
+                            </div>
+                            <div className="grid grid-cols-2">
+                              <span className="text-muted-foreground">Danno:</span>
+                              <span>8d6 fuoco</span>
+                            </div>
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </TooltipProvider>
+              </CardContent>
+            </Card>
+
+            {/* Dropdown & Context Menu */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Dropdown & Context Menu</CardTitle>
+                <CardDescription>Menu contestuali e dropdown</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Dropdown Menu */}
+                <div className="space-y-2">
+                  <Label>Dropdown Menu</Label>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline">
+                        Azioni Personaggio
+                        <ChevronDown className="w-4 h-4 ml-2" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuLabel>Azioni disponibili</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem>
+                        <Edit className="w-4 h-4 mr-2" />
+                        Modifica
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Copy className="w-4 h-4 mr-2" />
+                        Duplica
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="text-destructive">
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Elimina
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                {/* Context Menu */}
+                <div className="space-y-2">
+                  <Label>Context Menu</Label>
+                  <ContextMenu>
+                    <ContextMenuTrigger asChild>
+                      <Card className="w-full h-24 flex items-center justify-center border-dashed cursor-pointer hover:bg-accent">
+                        <p className="text-muted-foreground">Clicca destro qui</p>
+                      </Card>
+                    </ContextMenuTrigger>
+                    <ContextMenuContent>
+                      <ContextMenuItem>
+                        <Edit className="w-4 h-4 mr-2" />
+                        Modifica
+                      </ContextMenuItem>
+                      <ContextMenuItem>
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copia
+                      </ContextMenuItem>
+                      <ContextMenuItem>
+                        <Star className="w-4 h-4 mr-2" />
+                        Aggiungi ai preferiti
+                      </ContextMenuItem>
+                    </ContextMenuContent>
+                  </ContextMenu>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Toast & Loading */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Toast & Loading States</CardTitle>
+                <CardDescription>Notifiche e stati di caricamento</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Toast Examples */}
+                <div className="space-y-2">
+                  <Label>Toast Notifications</Label>
+                  <div className="flex flex-wrap gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => showToast.success('Personaggio creato con successo!')}
+                    >
+                      Success
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => showToast.error('Errore nel salvataggio della campagna')}
+                    >
+                      Error
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => showToast.info('Nuova sessione iniziata')}
+                    >
+                      Info
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => showToast.warning('Pochi slot incantesimi rimasti')}
+                    >
+                      Warning
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Loading States */}
+                <div className="space-y-3">
+                  <Label>Loading States</Label>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <LoadingSpinner size="sm" />
+                      <LoadingSpinner size="md" />
+                      <LoadingSpinner size="lg" />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-4 w-1/2" />
+                    </div>
+
+                    <LoadingOverlay isLoading={isLoading} className="h-24 border rounded-md">
+                      <div className="p-4">
+                        <p>Contenuto che viene coperto dal loading overlay</p>
+                        <Button 
+                          onClick={() => {
+                            setIsLoading(true)
+                            setTimeout(() => setIsLoading(false), 2000)
+                          }}
+                          disabled={isLoading}
+                        >
+                          Simula Caricamento
+                        </Button>
+                      </div>
+                    </LoadingOverlay>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
         {/* Footer */}
         <div className="text-center pt-12 pb-6">
           <Separator variant="decorative" className="mb-6" />
@@ -477,12 +814,12 @@ export default function ComponentsDemo() {
 
 const characterSchema = z.object({
   name: z.string().min(2, { message: "Il nome deve avere almeno 2 caratteri" }),
-  class: z.string({ required_error: "Seleziona una classe" }),
-  level: z.coerce.number().min(1).max(20, { message: "Il livello deve essere tra 1 e 20" }),
+  class: z.string().min(1, { message: "Seleziona una classe" }),
+  level: z.number().min(1).max(20, { message: "Il livello deve essere tra 1 e 20" }),
   background: z.string().min(10, { message: "Il background deve avere almeno 10 caratteri" }),
   multiclass: z.boolean(),
   skills: z.array(z.string()).min(1, { message: "Seleziona almeno una competenza" }),
-  alignment: z.string({ required_error: "Seleziona un allineamento" })
+  alignment: z.string().min(1, { message: "Seleziona un allineamento" })
 })
 
 type CharacterFormValues = z.infer<typeof characterSchema>
@@ -491,6 +828,7 @@ function CharacterFormExample() {
   const form = useForm<CharacterFormValues>({
     resolver: zodResolver(characterSchema),
     defaultValues: {
+      level: 1,
       multiclass: false,
       skills: [],
       alignment: "neutral"
@@ -568,7 +906,13 @@ function CharacterFormExample() {
               <FormItem>
                 <FormLabel>Livello</FormLabel>
                 <FormControl>
-                  <Input type="number" min="1" max="20" {...field} />
+                  <Input 
+                    type="number" 
+                    min="1" 
+                    max="20" 
+                    {...field}
+                    onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

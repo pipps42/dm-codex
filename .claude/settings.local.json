@@ -5,7 +5,10 @@
       "Bash(cp:*)",
       "Bash(mv:*)",
       "Bash(rm:*)",
-      "WebSearch"
+      "WebSearch",
+      "Read(/C:\\Users\\Corso1\\Desktop\\VARIE\\DnD\\dm-codex\\src\\renderer\\components\\ui/**)",
+      "Read(/C:\\Users\\Corso1\\Desktop\\VARIE\\DnD\\dm-codex\\src\\renderer\\components\\ui/**)",
+      "Read(/C:\\Users\\Corso1\\Desktop\\VARIE\\DnD\\dm-codex\\src\\renderer\\components\\ui/**)"
     ],
     "deny": [],
     "ask": [],
