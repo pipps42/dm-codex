@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import ComponentsDemo from './pages/ComponentsDemo'
+import UIShowcase from './pages/UIShowcase'
 import { Button } from './components/ui'
-import { Palette, Home } from 'lucide-react'
+import { Palette, Home, Layout } from 'lucide-react'
 
-type Page = 'home' | 'components'
+type Page = 'home' | 'components' | 'showcase'
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home')
@@ -13,6 +14,8 @@ function App() {
       const hash = window.location.hash.slice(1)
       if (hash === 'components') {
         setCurrentPage('components')
+      } else if (hash === 'showcase') {
+        setCurrentPage('showcase')
       } else {
         setCurrentPage('home')
       }
@@ -27,6 +30,8 @@ function App() {
     switch (currentPage) {
       case 'components':
         return <ComponentsDemo />
+      case 'showcase':
+        return <UIShowcase />
       case 'home':
       default:
         return <HomePage />
@@ -80,17 +85,33 @@ function HomePage() {
               <p>• Codice Condiviso: Types e utilities</p>
             </div>
             
-            <div className="space-y-3">
-              <Button 
-                onClick={() => window.location.hash = '#components'}
-                icon={<Palette className="w-4 h-4" />}
-                className="w-full"
-              >
-                Visualizza Design System
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                Esplora i componenti UI implementati
-              </p>
+            <div className="space-y-4">
+              <div className="space-y-3">
+                <Button
+                  onClick={() => window.location.hash = '#components'}
+                  icon={<Palette className="w-4 h-4" />}
+                  className="w-full"
+                >
+                  Design System (Classic)
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Panoramica completa di tutti i componenti UI
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <Button
+                  onClick={() => window.location.hash = '#showcase'}
+                  icon={<Layout className="w-4 h-4" />}
+                  className="w-full"
+                  variant="secondary"
+                >
+                  UI Showcase (Interactive)
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Demo interattiva con layout dell'app finale
+                </p>
+              </div>
             </div>
           </div>
         </main>
