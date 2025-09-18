@@ -135,3 +135,55 @@ export {
   Skeleton,
   LoadingOverlay
 } from './feedback/loading'
+
+// Layout Components
+export {
+  AppShell,
+  AppShellMain,
+  AppShellContainer,
+  AppShellFooter,
+} from './layout/app-shell'
+
+export { Grid, Flex } from './layout/grid'
+export type { GridProps, FlexProps } from './layout/grid'
+
+export {
+  Header,
+  HeaderLeft,
+  HeaderCenter,
+  HeaderRight,
+  HeaderTitle,
+  HeaderSearch,
+  HeaderActions,
+} from './layout/header'
+
+export {
+  PageHeader,
+  PageHeaderTop,
+  PageHeaderLeft,
+  PageHeaderRight,
+  PageHeaderTitle,
+  PageHeaderDescription,
+  PageHeaderActions,
+  Breadcrumb,
+} from './layout/page-header'
+export type { BreadcrumbItem } from './layout/page-header'
+
+export { ScrollArea, ScrollBar } from './layout/scroll-area'
+
+export {
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+  SidebarFooter,
+  SidebarNav,
+  SidebarNavItem,
+  SidebarGroup,
+} from './layout/sidebar'
+
+export {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent
+} from './layout/tabs'

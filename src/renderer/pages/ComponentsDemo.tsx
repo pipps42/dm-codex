@@ -3,14 +3,14 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Toaster } from 'sonner'
-import { 
-  Button, 
-  Input, 
-  Label, 
-  Card, 
-  CardHeader, 
-  CardTitle, 
-  CardDescription, 
+import {
+  Button,
+  Input,
+  Label,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
   CardContent,
   CardFooter,
   Separator,
@@ -66,15 +66,48 @@ import {
   ContextMenuTrigger,
   LoadingSpinner,
   Skeleton,
-  LoadingOverlay
+  LoadingOverlay,
+  AppShell,
+  AppShellMain,
+  AppShellContainer,
+  AppShellFooter,
+  Grid,
+  Flex,
+  Header,
+  HeaderLeft,
+  HeaderCenter,
+  HeaderRight,
+  HeaderTitle,
+  HeaderSearch,
+  HeaderActions,
+  PageHeader,
+  PageHeaderTop,
+  PageHeaderLeft,
+  PageHeaderRight,
+  PageHeaderTitle,
+  PageHeaderDescription,
+  PageHeaderActions,
+  Breadcrumb,
+  ScrollArea,
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+  SidebarFooter,
+  SidebarNav,
+  SidebarNavItem,
+  SidebarGroup,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent
 } from '../components/ui'
-import { 
-  Sword, 
-  Shield, 
-  Zap, 
-  Heart, 
-  User, 
-  Mail, 
+import {
+  Sword,
+  Shield,
+  Zap,
+  Heart,
+  User,
+  Mail,
   Search,
   Settings,
   Trash2,
@@ -85,13 +118,25 @@ import {
   Copy,
   Star,
   Bell,
-  HelpCircle
+  HelpCircle,
+  Home,
+  Book,
+  Users,
+  Map,
+  Dice6,
+  Menu,
+  ChevronRight,
+  FileText,
+  Calendar,
+  Crown,
+  Swords
 } from 'lucide-react'
 
 export default function ComponentsDemo() {
   const [isLoading, setIsLoading] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [inputError, setInputError] = useState('')
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   const handleLoadingDemo = () => {
     setIsLoading(true)
@@ -794,6 +839,275 @@ export default function ComponentsDemo() {
                       </div>
                     </LoadingOverlay>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Layout Components Section */}
+        <section className="space-y-6">
+          <h2 className="text-2xl font-semibold font-fantasy">Layout Components</h2>
+
+          <div className="space-y-6">
+            {/* Grid and Flex */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Grid & Flex</CardTitle>
+                <CardDescription>Utility components per layout responsive</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <h4 className="text-sm font-medium text-muted-foreground">Grid Layout</h4>
+                  <Grid cols={3} gap="md">
+                    <Card className="p-4 text-center">
+                      <div className="text-2xl mb-2">⚔️</div>
+                      <p className="text-sm">Combattimento</p>
+                    </Card>
+                    <Card className="p-4 text-center">
+                      <div className="text-2xl mb-2">📖</div>
+                      <p className="text-sm">Compendium</p>
+                    </Card>
+                    <Card className="p-4 text-center">
+                      <div className="text-2xl mb-2">👥</div>
+                      <p className="text-sm">Personaggi</p>
+                    </Card>
+                  </Grid>
+                </div>
+
+                <div className="space-y-4">
+                  <h4 className="text-sm font-medium text-muted-foreground">Flex Layout</h4>
+                  <Flex direction="row" justify="between" align="center" className="p-4 border rounded">
+                    <div className="flex items-center gap-2">
+                      <Crown className="w-5 h-5" />
+                      <span className="font-medium">DM Tools</span>
+                    </div>
+                    <Flex direction="row" gap="sm">
+                      <Button size="sm">Action 1</Button>
+                      <Button size="sm" variant="outline">Action 2</Button>
+                    </Flex>
+                  </Flex>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Tabs */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Tabs</CardTitle>
+                <CardDescription>Navigazione a tab per organizzare contenuto</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="characters" className="w-full">
+                  <TabsList className="grid w-full grid-cols-4">
+                    <TabsTrigger value="characters">Personaggi</TabsTrigger>
+                    <TabsTrigger value="spells">Incantesimi</TabsTrigger>
+                    <TabsTrigger value="items">Oggetti</TabsTrigger>
+                    <TabsTrigger value="monsters">Mostri</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="characters" className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Card className="p-4">
+                        <div className="flex items-center gap-3">
+                          <User className="w-8 h-8 text-primary" />
+                          <div>
+                            <h4 className="font-medium">Gandalf</h4>
+                            <p className="text-sm text-muted-foreground">Mago • Livello 20</p>
+                          </div>
+                        </div>
+                      </Card>
+                      <Card className="p-4">
+                        <div className="flex items-center gap-3">
+                          <Sword className="w-8 h-8 text-primary" />
+                          <div>
+                            <h4 className="font-medium">Aragorn</h4>
+                            <p className="text-sm text-muted-foreground">Ranger • Livello 18</p>
+                          </div>
+                        </div>
+                      </Card>
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="spells">
+                    <div className="text-center py-8">
+                      <Zap className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                      <p className="text-muted-foreground">Lista incantesimi</p>
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="items">
+                    <div className="text-center py-8">
+                      <Shield className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                      <p className="text-muted-foreground">Lista oggetti magici</p>
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="monsters">
+                    <div className="text-center py-8">
+                      <Swords className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                      <p className="text-muted-foreground">Bestario</p>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+
+            {/* Page Header */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Page Header</CardTitle>
+                <CardDescription>Header per le pagine con breadcrumb e azioni</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PageHeader>
+                  <PageHeaderTop>
+                    <PageHeaderLeft>
+                      <Breadcrumb items={[
+                        { label: 'Home', onClick: () => {} },
+                        { label: 'Campagne', onClick: () => {} },
+                        { label: 'La Miniera Perduta' }
+                      ]} />
+                      <PageHeaderTitle>La Miniera Perduta</PageHeaderTitle>
+                      <PageHeaderDescription>
+                        Una campagna epica nelle profondità delle montagne
+                      </PageHeaderDescription>
+                    </PageHeaderLeft>
+                    <PageHeaderRight>
+                      <PageHeaderActions>
+                        <Button size="sm" variant="outline">
+                          <Settings className="w-4 h-4 mr-2" />
+                          Impostazioni
+                        </Button>
+                        <Button size="sm">
+                          <Calendar className="w-4 h-4 mr-2" />
+                          Nuova Sessione
+                        </Button>
+                      </PageHeaderActions>
+                    </PageHeaderRight>
+                  </PageHeaderTop>
+                </PageHeader>
+              </CardContent>
+            </Card>
+
+            {/* Sidebar & App Shell Preview */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Sidebar & App Shell</CardTitle>
+                <CardDescription>Layout completo dell'applicazione con sidebar</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-96 border rounded-md overflow-hidden">
+                  <AppShell
+                    header={
+                      <Header>
+                        <HeaderLeft>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                          >
+                            <Menu className="w-4 h-4" />
+                          </Button>
+                          <HeaderTitle>DM's Codex</HeaderTitle>
+                        </HeaderLeft>
+                        <HeaderCenter>
+                          <HeaderSearch placeholder="Cerca incantesimi, mostri..." />
+                        </HeaderCenter>
+                        <HeaderRight>
+                          <HeaderActions>
+                            <Button variant="ghost" size="sm">
+                              <Bell className="w-4 h-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm">
+                              <User className="w-4 h-4" />
+                            </Button>
+                          </HeaderActions>
+                        </HeaderRight>
+                      </Header>
+                    }
+                    sidebar={
+                      <Sidebar
+                        collapsed={sidebarCollapsed}
+                        onCollapsedChange={setSidebarCollapsed}
+                      >
+                        <SidebarHeader>
+                          {!sidebarCollapsed && (
+                            <div className="flex items-center gap-2">
+                              <Crown className="w-6 h-6 text-primary" />
+                              <span className="font-bold">DM Tools</span>
+                            </div>
+                          )}
+                        </SidebarHeader>
+                        <SidebarContent>
+                          <SidebarNav>
+                            <SidebarNavItem active icon={<Home className="w-4 h-4" />}>
+                              {!sidebarCollapsed && "Dashboard"}
+                            </SidebarNavItem>
+                            <SidebarNavItem icon={<Book className="w-4 h-4" />}>
+                              {!sidebarCollapsed && "Compendium"}
+                            </SidebarNavItem>
+                            <SidebarNavItem icon={<Users className="w-4 h-4" />}>
+                              {!sidebarCollapsed && "Personaggi"}
+                            </SidebarNavItem>
+                            <SidebarNavItem icon={<Map className="w-4 h-4" />}>
+                              {!sidebarCollapsed && "Mappe"}
+                            </SidebarNavItem>
+                            <SidebarNavItem icon={<Dice6 className="w-4 h-4" />}>
+                              {!sidebarCollapsed && "Combattimento"}
+                            </SidebarNavItem>
+                          </SidebarNav>
+
+                          {!sidebarCollapsed && (
+                            <SidebarGroup title="Campagne Recenti">
+                              <SidebarNavItem icon={<FileText className="w-4 h-4" />}>
+                                La Miniera Perduta
+                              </SidebarNavItem>
+                              <SidebarNavItem icon={<FileText className="w-4 h-4" />}>
+                                Il Regno Nascosto
+                              </SidebarNavItem>
+                            </SidebarGroup>
+                          )}
+                        </SidebarContent>
+                        <SidebarFooter>
+                          {!sidebarCollapsed && (
+                            <div className="space-y-2">
+                              <div className="text-xs text-muted-foreground">
+                                Versione 2.1.0
+                              </div>
+                              <Button variant="outline" size="sm" className="w-full">
+                                <Settings className="w-4 h-4 mr-2" />
+                                Impostazioni
+                              </Button>
+                            </div>
+                          )}
+                        </SidebarFooter>
+                      </Sidebar>
+                    }
+                  >
+                    <AppShellMain>
+                      <AppShellContainer maxWidth="lg" centered>
+                        <ScrollArea className="h-40">
+                          <div className="space-y-4 p-4">
+                            <h3 className="text-lg font-semibold">Contenuto Principale</h3>
+                            <p className="text-muted-foreground">
+                              Questo è il contenuto principale dell'applicazione. Lo ScrollArea
+                              consente lo scorrimento del contenuto quando supera l'altezza disponibile.
+                            </p>
+                            <Separator />
+                            <p className="text-muted-foreground">
+                              L'AppShell fornisce la struttura di base per l'intera applicazione,
+                              combinando header, sidebar, contenuto principale e footer in un layout coerente.
+                            </p>
+                            <p className="text-muted-foreground">
+                              Il sidebar è completamente collassabile e mantiene lo stato delle
+                              icone anche quando è ridotto.
+                            </p>
+                            <p className="text-muted-foreground">
+                              Tutti i componenti sono responsive e si adattano alle diverse
+                              dimensioni dello schermo.
+                            </p>
+                          </div>
+                        </ScrollArea>
+                      </AppShellContainer>
+                    </AppShellMain>
+                  </AppShell>
                 </div>
               </CardContent>
             </Card>

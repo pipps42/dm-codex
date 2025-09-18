@@ -41,17 +41,17 @@ Componenti completati:
 - [x] **ContextMenu** (con Radix UI)
 - [x] **Loading** (spinner/skeleton)
 
-### 📦 Fase 4: Layout Components
+### ✅ Fase 4: Layout Components (Completata)
 **Prompt**: "Implementa componenti layout per strutturare l'app"
 
 Componenti:
-- **AppShell** (layout principale con sidebar)
-- **Sidebar** (navigazione principale)
-- **Header** (top bar con actions)
-- **PageHeader** (titolo pagina con breadcrumb)
-- **Tabs** (con Radix UI)
-- **ScrollArea** (con Radix UI)
-- **Grid/Flex** (utility layout components)
+- [x] **AppShell** (layout principale con sidebar)
+- [x] **Sidebar** (navigazione principale)
+- [x] **Header** (top bar con actions)
+- [x] **PageHeader** (titolo pagina con breadcrumb)
+- [x] **Tabs** (con Radix UI)
+- [x] **ScrollArea** (con Radix UI)
+- [x] **Grid/Flex** (utility layout components)
 
 ### 📦 Fase 5: Data Display Components
 **Prompt**: "Implementa componenti per visualizzare dati"
