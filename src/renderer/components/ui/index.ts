@@ -187,3 +187,48 @@ export {
   TabsTrigger,
   TabsContent
 } from './layout/tabs'
+
+// Data Display Components
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+  TableFilter,
+  useTableSorting,
+  useTableFiltering
+} from './data-display/table'
+
+export { DataTable } from './data-display/data-table'
+export type { DataTableColumn, DataTableProps } from './data-display/data-table'
+
+export {
+  Badge,
+  BadgeGroup,
+  StatusBadge
+} from './data-display/badge'
+
+export {
+  Avatar,
+  AvatarGroup,
+  CharacterAvatar
+} from './data-display/avatar'
+
+export {
+  Progress,
+  CircularProgress,
+  HealthBar,
+  SkillProgress
+} from './data-display/progress'
+
+export {
+  EmptyState,
+  NoResults,
+  NoData,
+  LoadingState,
+  ErrorState
+} from './data-display/empty-state'

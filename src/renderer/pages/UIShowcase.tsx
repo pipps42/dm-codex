@@ -67,6 +67,28 @@ import {
   LoadingSpinner,
   Skeleton,
   LoadingOverlay,
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+  DataTable,
+  Badge,
+  BadgeGroup,
+  StatusBadge,
+  Avatar,
+  AvatarGroup,
+  CharacterAvatar,
+  Progress,
+  CircularProgress,
+  HealthBar,
+  SkillProgress,
+  EmptyState,
+  NoResults,
+  NoData,
+  LoadingState,
+  ErrorState,
   AppShell,
   AppShellMain,
   AppShellContainer,
@@ -931,24 +953,319 @@ function LayoutSection() {
 }
 
 function DataSection() {
+  // Sample data for demonstrations
+  const characters = [
+    { id: 1, name: "Gandalf", class: "Wizard", level: 20, hp: 78, maxHp: 90, status: "active" },
+    { id: 2, name: "Aragorn", class: "Ranger", level: 18, hp: 85, maxHp: 95, status: "active" },
+    { id: 3, name: "Legolas", class: "Ranger", level: 16, hp: 67, maxHp: 80, status: "inactive" },
+    { id: 4, name: "Gimli", class: "Fighter", level: 17, hp: 92, maxHp: 100, status: "active" },
+    { id: 5, name: "Frodo", class: "Rogue", level: 8, hp: 35, maxHp: 45, status: "pending" },
+  ]
+
+  const spellsColumns = [
+    { key: 'name', header: 'Nome', sortable: true },
+    { key: 'level', header: 'Livello', sortable: true, width: '100px' },
+    { key: 'school', header: 'Scuola', sortable: true },
+    {
+      key: 'castingTime',
+      header: 'Tempo',
+      sortable: true,
+      cell: (spell: any) => (
+        <Badge variant="outline" size="sm">
+          {spell.castingTime}
+        </Badge>
+      )
+    },
+    {
+      key: 'actions',
+      header: 'Azioni',
+      cell: () => (
+        <Button variant="ghost" size="sm">
+          <Edit className="w-4 h-4" />
+        </Button>
+      )
+    }
+  ]
+
+  const spells = [
+    { name: "Fireball", level: 3, school: "Evocation", castingTime: "1 azione" },
+    { name: "Magic Missile", level: 1, school: "Evocation", castingTime: "1 azione" },
+    { name: "Healing Word", level: 1, school: "Evocation", castingTime: "1 azione bonus" },
+    { name: "Shield", level: 1, school: "Abjuration", castingTime: "1 reazione" },
+    { name: "Counterspell", level: 3, school: "Abjuration", castingTime: "1 reazione" },
+  ]
+
+  const skills = [
+    { name: "Forza", value: 18, max: 20 },
+    { name: "Destrezza", value: 14, max: 20 },
+    { name: "Costituzione", value: 16, max: 20 },
+    { name: "Intelligenza", value: 20, max: 20 },
+  ]
+
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Data Display Components</CardTitle>
-          <CardDescription>Componenti per visualizzare dati (Coming Soon)</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-12">
-            <Grid3X3 className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">Data Display Components</h3>
-            <p className="text-muted-foreground max-w-md mx-auto">
-              I componenti per la visualizzazione dei dati (Table, DataTable, Badge, Avatar, ecc.)
-              saranno implementati nella prossima fase di sviluppo.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <Tabs defaultValue="tables" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="tables">Tables</TabsTrigger>
+          <TabsTrigger value="badges">Badges</TabsTrigger>
+          <TabsTrigger value="avatars">Avatars</TabsTrigger>
+          <TabsTrigger value="progress">Progress</TabsTrigger>
+          <TabsTrigger value="empty">Empty States</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="tables" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Basic Table</CardTitle>
+              <CardDescription>Tabella semplice con sorting</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nome</TableHead>
+                    <TableHead>Classe</TableHead>
+                    <TableHead>Livello</TableHead>
+                    <TableHead>HP</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {characters.map((character) => (
+                    <TableRow key={character.id}>
+                      <TableCell className="font-medium">{character.name}</TableCell>
+                      <TableCell>{character.class}</TableCell>
+                      <TableCell>{character.level}</TableCell>
+                      <TableCell>
+                        <HealthBar
+                          current={character.hp}
+                          max={character.maxHp}
+                          size="sm"
+                          showNumbers={false}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge status={character.status as any} size="sm" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Advanced DataTable</CardTitle>
+              <CardDescription>DataTable con funzionalità avanzate</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DataTable
+                data={spells}
+                columns={spellsColumns}
+                searchPlaceholder="Cerca incantesimi..."
+                selectable
+                pageSize={3}
+                onExport={() => alert('Export functionality')}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="badges" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Badge Variants</CardTitle>
+              <CardDescription>Diverse varianti di badge per stati e tag</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium">Basic Badges</h4>
+                <Flex direction="row" gap="md" wrap>
+                  <Badge>Default</Badge>
+                  <Badge variant="secondary">Secondary</Badge>
+                  <Badge variant="success">Success</Badge>
+                  <Badge variant="warning">Warning</Badge>
+                  <Badge variant="destructive">Destructive</Badge>
+                  <Badge variant="outline">Outline</Badge>
+                </Flex>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium">Status Badges</h4>
+                <Flex direction="row" gap="md" wrap>
+                  <StatusBadge status="active" showDot />
+                  <StatusBadge status="inactive" showDot />
+                  <StatusBadge status="pending" showDot />
+                  <StatusBadge status="success" showDot />
+                  <StatusBadge status="error" showDot />
+                  <StatusBadge status="warning" showDot />
+                </Flex>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium">Removable Badges</h4>
+                <BadgeGroup
+                  badges={[
+                    { id: 1, label: "Fuoco", variant: "destructive", removable: true },
+                    { id: 2, label: "Ghiaccio", variant: "secondary", removable: true },
+                    { id: 3, label: "Fulmine", variant: "warning", removable: true },
+                    { id: 4, label: "Veleno", variant: "success", removable: true },
+                  ]}
+                  onRemove={(id) => console.log('Remove badge:', id)}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="avatars" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Avatar Components</CardTitle>
+              <CardDescription>Avatar per personaggi e utenti</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium">Basic Avatars</h4>
+                <Flex direction="row" gap="md" align="center">
+                  <Avatar size="xs" fallback="XS" />
+                  <Avatar size="sm" fallback="SM" />
+                  <Avatar size="md" fallback="MD" />
+                  <Avatar size="lg" fallback="LG" />
+                  <Avatar size="xl" fallback="XL" />
+                  <Avatar size="2xl" fallback="2XL" />
+                </Flex>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium">Character Avatars</h4>
+                <Flex direction="row" gap="md" align="center">
+                  <CharacterAvatar
+                    characterClass="wizard"
+                    level={20}
+                    alt="Gandalf"
+                    size="lg"
+                  />
+                  <CharacterAvatar
+                    characterClass="fighter"
+                    level={18}
+                    alt="Aragorn"
+                    size="lg"
+                  />
+                  <CharacterAvatar
+                    characterClass="rogue"
+                    level={16}
+                    alt="Legolas"
+                    size="lg"
+                  />
+                </Flex>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium">Avatar Group</h4>
+                <AvatarGroup
+                  avatars={[
+                    { id: 1, alt: "Gandalf", fallback: "GA" },
+                    { id: 2, alt: "Aragorn", fallback: "AR" },
+                    { id: 3, alt: "Legolas", fallback: "LE" },
+                    { id: 4, alt: "Gimli", fallback: "GI" },
+                    { id: 5, alt: "Frodo", fallback: "FR" },
+                    { id: 6, alt: "Sam", fallback: "SA" },
+                  ]}
+                  max={4}
+                  size="md"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="progress" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Progress Components</CardTitle>
+              <CardDescription>Barre di progresso e indicatori</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium">Linear Progress</h4>
+                <div className="space-y-3">
+                  <Progress value={75} max={100} variant="default" showValue />
+                  <Progress value={50} max={100} variant="success" showValue />
+                  <Progress value={25} max={100} variant="warning" showValue />
+                  <Progress value={10} max={100} variant="destructive" showValue />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium">Circular Progress</h4>
+                <Flex direction="row" gap="lg" align="center">
+                  <CircularProgress value={75} showValue />
+                  <CircularProgress value={50} variant="success" showValue />
+                  <CircularProgress value={25} variant="warning" showValue />
+                </Flex>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium">Health Bars</h4>
+                <div className="space-y-3 max-w-md">
+                  <HealthBar current={78} max={90} />
+                  <HealthBar current={45} max={60} temporary={10} />
+                  <HealthBar current={15} max={80} />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-sm font-medium">Skill Progress</h4>
+                <div className="max-w-md">
+                  <SkillProgress skills={skills} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="empty" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Empty State Components</CardTitle>
+              <CardDescription>Stati vuoti per diverse situazioni</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Grid cols={2} gap="lg">
+                <Card className="p-4">
+                  <NoData
+                    entityType="characters"
+                    size="sm"
+                    onCreateNew={() => alert('Create character')}
+                  />
+                </Card>
+
+                <Card className="p-4">
+                  <NoResults
+                    searchTerm="dragon"
+                    size="sm"
+                    onClearSearch={() => alert('Clear search')}
+                  />
+                </Card>
+
+                <Card className="p-4">
+                  <LoadingState size="sm" />
+                </Card>
+
+                <Card className="p-4">
+                  <ErrorState
+                    error="Failed to load data"
+                    size="sm"
+                    onRetry={() => alert('Retry')}
+                  />
+                </Card>
+              </Grid>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

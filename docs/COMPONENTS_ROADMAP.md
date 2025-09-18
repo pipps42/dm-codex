@@ -57,13 +57,13 @@ Componenti:
 **Prompt**: "Implementa componenti per visualizzare dati"
 
 Componenti:
-- **Table** (con sorting, filtering)
-- **DataTable** (wrapper avanzato)
-- **Badge** (per stati, tag)
-- **Avatar** (per PG/NPC)
-- **Progress** (barre progresso)
-- **Stat** (display statistiche)
-- **EmptyState** (quando non ci sono dati)
+- [x] **Table** (con sorting, filtering)
+- [x] **DataTable** (wrapper avanzato)
+- [x] **Badge** (per stati, tag)
+- [x] **Avatar** (per PG/NPC)
+- [x] **Progress** (barre progresso)
+- [temporarily-ignored] **Stat** (display statistiche)
+- [x] **EmptyState** (quando non ci sono dati)
 
 ### 📦 Fase 6: Domain-Specific Components
 **Prompt**: "Implementa componenti specifici per D&D"
