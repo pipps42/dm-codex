@@ -120,7 +120,8 @@ import {
   Tabs,
   TabsList,
   TabsTrigger,
-  TabsContent
+  TabsContent,
+  ImageUpload
 } from '../components/ui'
 import {
   Sword,
@@ -620,6 +621,24 @@ function FormSection() {
               <div className="flex items-center space-x-2">
                 <Switch id="multiclass" />
                 <Label htmlFor="multiclass">Personaggio multiclasse</Label>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Avatar Personaggio</Label>
+                <ImageUpload
+                  placeholder="Carica un avatar per il personaggio"
+                  onChange={(file, dataUrl) => {
+                    if (file) {
+                      showToast.success(`Avatar caricato: ${file.name}`)
+                    }
+                  }}
+                  onError={(error) => {
+                    showToast.error(`Errore: ${error}`)
+                  }}
+                  className="h-48 max-w-xs"
+                  previewClassName="h-48"
+                  maxSize={3}
+                />
               </div>
             </TabsContent>
 

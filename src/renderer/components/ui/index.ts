@@ -51,6 +51,9 @@ export {
   FormField,
 } from './form/form'
 
+export { ImageUpload } from './form/image-upload'
+export type { ImageUploadProps } from './form/image-upload'
+
 // Feedback Components
 export {
   Dialog,

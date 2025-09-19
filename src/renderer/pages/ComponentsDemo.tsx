@@ -99,7 +99,8 @@ import {
   Tabs,
   TabsList,
   TabsTrigger,
-  TabsContent
+  TabsContent,
+  ImageUpload
 } from '../components/ui'
 import {
   Sword,
@@ -500,6 +501,25 @@ export default function ComponentsDemo() {
                 <div className="flex items-center space-x-2">
                   <Switch id="multiclass" />
                   <Label htmlFor="multiclass">Personaggio multiclasse</Label>
+                </div>
+
+                {/* Image Upload */}
+                <div className="space-y-2">
+                  <Label>Ritratto Personaggio</Label>
+                  <ImageUpload
+                    placeholder="Carica un ritratto per il personaggio"
+                    onChange={(file, dataUrl) => {
+                      if (file) {
+                        showToast.success(`Immagine caricata: ${file.name}`)
+                      }
+                    }}
+                    onError={(error) => {
+                      showToast.error(`Errore: ${error}`)
+                    }}
+                    className="h-48"
+                    previewClassName="h-48"
+                    maxSize={5}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -1133,7 +1153,8 @@ const characterSchema = z.object({
   background: z.string().min(10, { message: "Il background deve avere almeno 10 caratteri" }),
   multiclass: z.boolean(),
   skills: z.array(z.string()).min(1, { message: "Seleziona almeno una competenza" }),
-  alignment: z.string().min(1, { message: "Seleziona un allineamento" })
+  alignment: z.string().min(1, { message: "Seleziona un allineamento" }),
+  avatar: z.string().optional()
 })
 
 type CharacterFormValues = z.infer<typeof characterSchema>
@@ -1358,6 +1379,39 @@ function CharacterFormExample() {
                   </FormItem>
                 </RadioGroup>
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Avatar Upload */}
+        <FormField
+          control={form.control}
+          name="avatar"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Avatar Personaggio</FormLabel>
+              <FormControl>
+                <ImageUpload
+                  value={field.value}
+                  onChange={(file, dataUrl) => {
+                    field.onChange(dataUrl || '')
+                    if (file) {
+                      showToast.success(`Avatar caricato: ${file.name}`)
+                    }
+                  }}
+                  onError={(error) => {
+                    showToast.error(`Errore avatar: ${error}`)
+                  }}
+                  placeholder="Carica l'avatar del personaggio"
+                  className="h-64"
+                  previewClassName="h-64"
+                  maxSize={3}
+                />
+              </FormControl>
+              <FormDescription>
+                Immagine del personaggio per identificarlo facilmente
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
