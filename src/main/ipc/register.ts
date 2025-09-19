@@ -2,6 +2,7 @@
 // Manages registration and unregistration of all IPC handlers
 
 import { registerCampaignHandlers, unregisterCampaignHandlers } from './handlers/campaignHandlers'
+import { registerFileSystemHandlers, unregisterFileSystemHandlers } from './handlers/fileSystemHandlers'
 import { DatabaseManager } from '../database/client'
 
 export class IpcRegistry {
@@ -24,7 +25,8 @@ export class IpcRegistry {
 
       // Register all handler modules
       registerCampaignHandlers()
-      
+      registerFileSystemHandlers()
+
       // TODO: Add other handler registrations here as they are implemented
       // registerNPCHandlers()
       // registerLocationHandlers()
@@ -53,7 +55,8 @@ export class IpcRegistry {
 
       // Unregister all handler modules
       unregisterCampaignHandlers()
-      
+      unregisterFileSystemHandlers()
+
       // TODO: Add other handler unregistrations here as they are implemented
       // unregisterNPCHandlers()
       // unregisterLocationHandlers()

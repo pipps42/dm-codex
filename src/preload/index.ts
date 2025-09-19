@@ -7,7 +7,9 @@ import type {
   IpcResult,
   CreateCampaignInput,
   UpdateCampaignInput,
-  CampaignWithStats
+  CampaignWithStats,
+  FileOperationResult,
+  FileInfo
 } from '../shared/types/ipc'
 import type { Campaign } from '../main/database/generated/prisma'
 
@@ -46,10 +48,52 @@ const campaignApi = {
   }
 }
 
+// File System API - Type-safe wrapper for file operations
+const fileSystemApi = {
+  async saveFile(input: IpcChannelInput<'filesystem:saveFile'>): Promise<IpcResult<FileOperationResult>> {
+    return invokeIpc('filesystem:saveFile', input)
+  },
+
+  async deleteFile(input: IpcChannelInput<'filesystem:deleteFile'>): Promise<IpcResult<void>> {
+    return invokeIpc('filesystem:deleteFile', input)
+  },
+
+  async listFiles(input: IpcChannelInput<'filesystem:listFiles'>): Promise<IpcResult<string[]>> {
+    return invokeIpc('filesystem:listFiles', input)
+  },
+
+  async getFileInfo(input: IpcChannelInput<'filesystem:getFileInfo'>): Promise<IpcResult<FileInfo>> {
+    return invokeIpc('filesystem:getFileInfo', input)
+  },
+
+  async createBackup(input: IpcChannelInput<'filesystem:createBackup'>): Promise<IpcResult<string>> {
+    return invokeIpc('filesystem:createBackup', input)
+  },
+
+  async cleanupBackups(input: IpcChannelInput<'filesystem:cleanupBackups'>): Promise<IpcResult<void>> {
+    return invokeIpc('filesystem:cleanupBackups', input)
+  },
+
+  async getCampaignPath(input: IpcChannelInput<'filesystem:getCampaignPath'>): Promise<IpcResult<string>> {
+    return invokeIpc('filesystem:getCampaignPath', input)
+  },
+
+  async getTypedPath(input: IpcChannelInput<'filesystem:getTypedPath'>): Promise<IpcResult<string>> {
+    return invokeIpc('filesystem:getTypedPath', input)
+  },
+
+  async validateFile(input: IpcChannelInput<'filesystem:validateFile'>): Promise<IpcResult<void>> {
+    return invokeIpc('filesystem:validateFile', input)
+  }
+}
+
 // --------- Expose DM's Codex API to the Renderer process ---------
 contextBridge.exposeInMainWorld('dmCodex', {
   // Campaign operations
   campaign: campaignApi,
+
+  // File system operations
+  fileSystem: fileSystemApi,
 
   // TODO: Add other entity APIs as they are implemented
   // npc: npcApi,

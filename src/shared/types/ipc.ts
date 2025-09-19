@@ -66,6 +66,86 @@ export interface IpcChannels {
     input: { id: string }
     output: Campaign
   }
+
+  // File System channels
+  'filesystem:saveFile': {
+    input: {
+      campaignId: string
+      fileType: 'cover' | 'portrait' | 'map' | 'asset' | 'backup' | 'export'
+      sourcePath: string
+      fileName?: string
+      optimize?: boolean
+      optimizationOptions?: {
+        maxWidth?: number
+        maxHeight?: number
+        quality?: number
+        format?: 'jpeg' | 'png' | 'webp'
+        progressive?: boolean
+      }
+      overwrite?: boolean
+      generateUniqueId?: boolean
+    }
+    output: FileOperationResult
+  }
+  'filesystem:deleteFile': {
+    input: {
+      campaignId: string
+      fileType: 'cover' | 'portrait' | 'map' | 'asset' | 'backup' | 'export'
+      fileName: string
+    }
+    output: void
+  }
+  'filesystem:listFiles': {
+    input: {
+      campaignId: string
+      fileType: 'cover' | 'portrait' | 'map' | 'asset' | 'backup' | 'export'
+    }
+    output: string[]
+  }
+  'filesystem:getFileInfo': {
+    input: {
+      campaignId: string
+      fileType: 'cover' | 'portrait' | 'map' | 'asset' | 'backup' | 'export'
+      fileName: string
+    }
+    output: FileInfo
+  }
+  'filesystem:createBackup': {
+    input: {
+      campaignId: string
+    }
+    output: string
+  }
+  'filesystem:cleanupBackups': {
+    input: {
+      campaignId: string
+      keepCount?: number
+    }
+    output: void
+  }
+  'filesystem:getCampaignPath': {
+    input: {
+      campaignId: string
+      subPath?: string
+    }
+    output: string
+  }
+  'filesystem:getTypedPath': {
+    input: {
+      campaignId: string
+      fileType: 'cover' | 'portrait' | 'map' | 'asset' | 'backup' | 'export'
+      fileName?: string
+    }
+    output: string
+  }
+  'filesystem:validateFile': {
+    input: {
+      filePath: string
+      maxSize?: number
+      allowedExtensions?: string[]
+    }
+    output: void
+  }
 }
 
 // Helper type to extract channel names
@@ -80,6 +160,25 @@ export type IpcHandler<T extends IpcChannelName> = (
   input: IpcChannelInput<T>
 ) => Promise<IpcResult<IpcChannelOutput<T>>>
 
+// File System input types
+export interface FileOperationResult {
+  success: boolean
+  originalPath: string
+  finalPath: string
+  optimized: boolean
+  sizeReduction?: number
+  error?: string
+}
+
+export interface FileInfo {
+  path: string
+  size: number
+  created: Date
+  modified: Date
+  isImage: boolean
+  dimensions?: { width: number; height: number }
+}
+
 // Error codes for consistent error handling
 export enum IpcErrorCode {
   VALIDATION_ERROR = 'VALIDATION_ERROR',
@@ -87,6 +186,7 @@ export enum IpcErrorCode {
   ALREADY_EXISTS = 'ALREADY_EXISTS',
   DATABASE_ERROR = 'DATABASE_ERROR',
   FILE_SYSTEM_ERROR = 'FILE_SYSTEM_ERROR',
+  PERMISSION_DENIED = 'PERMISSION_DENIED',
   UNKNOWN_ERROR = 'UNKNOWN_ERROR'
 }
 
