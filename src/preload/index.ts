@@ -54,6 +54,10 @@ const fileSystemApi = {
     return invokeIpc('filesystem:saveFile', input)
   },
 
+  async saveFileFromBuffer(input: IpcChannelInput<'filesystem:saveFileFromBuffer'>): Promise<IpcResult<FileOperationResult>> {
+    return invokeIpc('filesystem:saveFileFromBuffer', input)
+  },
+
   async deleteFile(input: IpcChannelInput<'filesystem:deleteFile'>): Promise<IpcResult<void>> {
     return invokeIpc('filesystem:deleteFile', input)
   },

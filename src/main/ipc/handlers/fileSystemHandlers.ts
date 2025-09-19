@@ -37,6 +37,17 @@ export interface GetFileInfoInput {
   fileName: string
 }
 
+export interface SaveFileFromBufferInput {
+  campaignId: string
+  fileType: FileType
+  fileName: string
+  buffer: ArrayBuffer
+  mimeType: string
+  optimize?: boolean
+  optimizationOptions?: ImageOptimizationOptions
+  overwrite?: boolean
+}
+
 export interface CreateBackupInput {
   campaignId: string
 }
@@ -70,6 +81,25 @@ export class FileSystemHandlers {
             optimizationOptions: input.optimizationOptions,
             overwrite: input.overwrite,
             generateUniqueId: input.generateUniqueId
+          }
+        )
+        return createSuccessResult(result)
+      })
+    })
+
+    // Save file from buffer (for File objects)
+    ipcMain.handle('filesystem:saveFileFromBuffer', async (_, input: SaveFileFromBufferInput): Promise<IpcResult<any>> => {
+      return this.handleWithErrorManagement(async () => {
+        const result = await this.service.saveFileFromBuffer(
+          input.campaignId,
+          input.fileType,
+          input.fileName,
+          input.buffer,
+          input.mimeType,
+          {
+            optimize: input.optimize,
+            optimizationOptions: input.optimizationOptions,
+            overwrite: input.overwrite
           }
         )
         return createSuccessResult(result)
@@ -152,6 +182,7 @@ export class FileSystemHandlers {
   unregister(): void {
     const channels = [
       'filesystem:saveFile',
+      'filesystem:saveFileFromBuffer',
       'filesystem:deleteFile',
       'filesystem:listFiles',
       'filesystem:getFileInfo',

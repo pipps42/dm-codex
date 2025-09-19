@@ -3,6 +3,7 @@
 
 import { CampaignRepository } from '../database/repositories/CampaignRepository'
 import { getPrismaClient } from '../database/client'
+import { FileSystemService } from './FileSystemService'
 import type { Campaign } from '../database/generated/prisma'
 import type { CreateCampaignInput, UpdateCampaignInput, CampaignWithStats } from '../../shared/types/ipc'
 import fs from 'fs-extra'
@@ -27,6 +28,11 @@ const updateCampaignSchema = z.object({
 
 export class CampaignService {
   private repository: CampaignRepository | null = null
+  private fileSystemService: FileSystemService
+
+  constructor() {
+    this.fileSystemService = new FileSystemService()
+  }
 
   private async getRepository(): Promise<CampaignRepository> {
     if (!this.repository) {
@@ -223,7 +229,7 @@ This folder contains all data files for this campaign.
   }
 
   /**
-   * Copy campaign cover image to campaign folder
+   * Set campaign cover image with optimization
    */
   async setCoverImage(campaignId: string, sourcePath: string): Promise<string> {
     if (!z.string().uuid().safeParse(campaignId).success) {
@@ -238,26 +244,30 @@ This folder contains all data files for this campaign.
       throw new Error(`Campaign with ID "${campaignId}" not found`)
     }
 
-    // Validate source file exists
-    if (!(await fs.pathExists(sourcePath))) {
-      throw new Error('Source image file does not exist')
+    // Use FileSystemService to save and optimize the image
+    const result = await this.fileSystemService.saveFile(
+      campaignId,
+      'cover',
+      sourcePath,
+      {
+        fileName: `cover${path.extname(sourcePath)}`,
+        optimize: true,
+        optimizationOptions: this.fileSystemService.getOptimizationPresets('cover'),
+        overwrite: true
+      }
+    )
+
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to save cover image')
     }
-
-    // Generate destination path
-    const ext = path.extname(sourcePath)
-    const fileName = `cover${ext}`
-    const destPath = path.join(this.getCampaignDataPath(campaignId), 'cover', fileName)
-
-    // Copy file
-    await fs.copy(sourcePath, destPath, { overwrite: true })
 
     // Update campaign with new cover path
     await repository.update({
       id: campaignId,
-      coverImagePath: destPath
+      coverImagePath: result.finalPath
     })
 
-    return destPath
+    return result.finalPath
   }
 
   /**
@@ -276,9 +286,15 @@ This folder contains all data files for this campaign.
       throw new Error(`Campaign with ID "${campaignId}" not found`)
     }
 
-    // Remove cover image file if exists
-    if (campaign.coverImagePath && await fs.pathExists(campaign.coverImagePath)) {
-      await fs.remove(campaign.coverImagePath)
+    // Remove cover image file using FileSystemService
+    if (campaign.coverImagePath) {
+      try {
+        const fileName = path.basename(campaign.coverImagePath)
+        await this.fileSystemService.deleteFile(campaignId, 'cover', fileName)
+      } catch (error) {
+        console.warn('Failed to delete cover image file:', error)
+        // Continue with database update even if file deletion fails
+      }
     }
 
     // Update campaign to remove cover path

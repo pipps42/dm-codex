@@ -19,7 +19,7 @@ export type FileType = 'cover' | 'portrait' | 'map' | 'asset' | 'backup' | 'expo
 const fileValidationSchema = z.object({
   path: z.string().min(1, 'File path is required'),
   maxSize: z.number().positive().default(10 * 1024 * 1024), // 10MB default
-  allowedExtensions: z.array(z.string()).default(SUPPORTED_IMAGE_FORMATS)
+  allowedExtensions: z.array(z.string()).default([...SUPPORTED_IMAGE_FORMATS])
 })
 
 // Image optimization options
@@ -218,6 +218,73 @@ export class FileSystemService {
         originalSize: stats.size,
         optimizedSize: stats.size,
         sizeReduction: 0
+      }
+    }
+  }
+
+  /**
+   * Save file from buffer (for File objects from renderer)
+   */
+  async saveFileFromBuffer(
+    campaignId: string,
+    fileType: FileType,
+    fileName: string,
+    buffer: ArrayBuffer,
+    mimeType: string,
+    options: {
+      optimize?: boolean
+      optimizationOptions?: ImageOptimizationOptions
+      overwrite?: boolean
+    } = {}
+  ): Promise<FileOperationResult> {
+    const {
+      optimize = true,
+      optimizationOptions = {},
+      overwrite = false
+    } = options
+
+    try {
+      // Validate campaign ID
+      if (!z.string().uuid().safeParse(campaignId).success) {
+        throw new Error('Invalid campaign ID format')
+      }
+
+      // Ensure campaign directories exist
+      await this.ensureCampaignDirectories(campaignId)
+
+      // Create temporary file from buffer
+      const tempDir = require('os').tmpdir()
+      const tempFileName = `temp_${Date.now()}_${fileName}`
+      const tempPath = path.join(tempDir, tempFileName)
+
+      // Write buffer to temporary file
+      await fs.writeFile(tempPath, Buffer.from(buffer))
+
+      try {
+        // Use existing saveFile method with temporary file
+        const result = await this.saveFile(campaignId, fileType, tempPath, {
+          fileName,
+          optimize,
+          optimizationOptions,
+          overwrite
+        })
+
+        // Clean up temporary file
+        await fs.remove(tempPath)
+
+        return result
+      } catch (error) {
+        // Clean up temporary file on error
+        await fs.remove(tempPath).catch(() => {})
+        throw error
+      }
+    } catch (error) {
+      return {
+        success: false,
+        originalPath: `buffer:${fileName}`,
+        finalPath: '',
+        optimized: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
       }
     }
   }
@@ -474,5 +541,47 @@ export class FileSystemService {
   private isImageFile(filePath: string): boolean {
     const ext = path.extname(filePath).toLowerCase()
     return SUPPORTED_IMAGE_FORMATS.includes(ext as SupportedImageFormat)
+  }
+
+  /**
+   * Get optimization presets for different file types
+   */
+  getOptimizationPresets(fileType: FileType): ImageOptimizationOptions {
+    const presets: Record<FileType, ImageOptimizationOptions> = {
+      cover: {
+        maxWidth: 1200,
+        maxHeight: 800,
+        quality: 90,
+        format: 'webp',
+        progressive: true
+      },
+      portrait: {
+        maxWidth: 512,
+        maxHeight: 512,
+        quality: 85,
+        format: 'webp',
+        progressive: true
+      },
+      map: {
+        maxWidth: 2048,
+        maxHeight: 2048,
+        quality: 95,
+        progressive: true
+      },
+      asset: {
+        maxWidth: 1920,
+        maxHeight: 1080,
+        quality: 85,
+        progressive: true
+      },
+      backup: {
+        // No optimization for backups
+      },
+      export: {
+        // No optimization for exports
+      }
+    }
+
+    return presets[fileType] || {}
   }
 }

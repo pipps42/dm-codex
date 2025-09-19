@@ -219,7 +219,7 @@ export class FileSystemService {
   }
 
   /**
-   * Helper: Save uploaded file from ImageUpload component
+   * Save File object directly to campaign directory
    */
   async saveUploadedFile(
     campaignId: string,
@@ -227,14 +227,27 @@ export class FileSystemService {
     file: File,
     options: Omit<SaveFileOptions, 'sourcePath'> = {}
   ): Promise<FileOperationResult> {
-    // Create a temporary file path - in a real scenario you'd need to:
-    // 1. Save the file to a temp location first
-    // 2. Use that path for the actual save operation
-    // For now, we'll throw an error with guidance
-    throw new Error(
-      'Direct File object upload not yet implemented. ' +
-      'Please use file path or implement temporary file handling.'
-    )
+    // Convert File to ArrayBuffer
+    const buffer = await file.arrayBuffer()
+
+    const input: IpcChannelInput<'filesystem:saveFileFromBuffer'> = {
+      campaignId,
+      fileType,
+      fileName: options.fileName || file.name,
+      buffer,
+      mimeType: file.type,
+      optimize: options.optimize,
+      optimizationOptions: options.optimizationOptions,
+      overwrite: options.overwrite
+    }
+
+    const result = await window.dmCodex.fileSystem.saveFileFromBuffer(input)
+
+    if (!result.success) {
+      throw new Error(result.error?.message || 'Failed to save file')
+    }
+
+    return result.data!
   }
 
   /**

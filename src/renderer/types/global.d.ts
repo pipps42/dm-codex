@@ -27,6 +27,7 @@ declare global {
       // File system operations
       fileSystem: {
         saveFile(input: IpcChannelInput<'filesystem:saveFile'>): Promise<IpcResult<FileOperationResult>>
+        saveFileFromBuffer(input: IpcChannelInput<'filesystem:saveFileFromBuffer'>): Promise<IpcResult<FileOperationResult>>
         deleteFile(input: IpcChannelInput<'filesystem:deleteFile'>): Promise<IpcResult<void>>
         listFiles(input: IpcChannelInput<'filesystem:listFiles'>): Promise<IpcResult<string[]>>
         getFileInfo(input: IpcChannelInput<'filesystem:getFileInfo'>): Promise<IpcResult<FileInfo>>

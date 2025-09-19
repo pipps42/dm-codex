@@ -1,11 +1,14 @@
 import React, { useState, useRef, useCallback } from 'react'
-import { Upload, X, Image as ImageIcon, AlertCircle } from 'lucide-react'
+import { Upload, X, Image as ImageIcon, AlertCircle, CheckCircle } from 'lucide-react'
 import { cn } from '../../../lib/utils'
 import { Button } from '../foundation/button'
+import { fileSystemService, type FileType } from '../../../services/fileSystemService'
+import { processUploadedFile, type EnhancedFileInfo } from '../../../utils/fileUtils'
+import type { FileOperationResult } from '../../../../shared/types/ipc'
 
 export interface ImageUploadProps {
   value?: string
-  onChange?: (file: File | null, dataUrl?: string) => void
+  onChange?: (file: File | null, dataUrl?: string, result?: FileOperationResult) => void
   onError?: (error: string) => void
   accept?: string
   maxSize?: number // in MB
@@ -13,6 +16,15 @@ export interface ImageUploadProps {
   className?: string
   placeholder?: string
   previewClassName?: string
+
+  // FileSystem integration (optional)
+  autoSave?: boolean
+  campaignId?: string
+  fileType?: FileType
+  fileName?: string
+  optimize?: boolean
+  onSaveSuccess?: (result: FileOperationResult) => void
+  onSaveError?: (error: string) => void
 }
 
 const ACCEPTED_FORMATS = ['image/png', 'image/jpg', 'image/jpeg', 'image/webp']
@@ -27,12 +39,24 @@ export function ImageUpload({
   disabled = false,
   className,
   placeholder = 'Trascina qui un\'immagine o clicca per selezionare',
-  previewClassName
+  previewClassName,
+
+  // FileSystem integration
+  autoSave = false,
+  campaignId,
+  fileType = 'asset',
+  fileName,
+  optimize = true,
+  onSaveSuccess,
+  onSaveError
 }: ImageUploadProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isSaved, setIsSaved] = useState(false)
   const [preview, setPreview] = useState<string | null>(value || null)
   const [error, setError] = useState<string | null>(null)
+  const [saveResult, setSaveResult] = useState<FileOperationResult | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const validateFile = useCallback((file: File): string | null => {
@@ -57,6 +81,8 @@ export function ImageUpload({
 
     setError(null)
     setIsUploading(true)
+    setIsSaved(false)
+    setSaveResult(null)
 
     try {
       // Create preview
@@ -68,7 +94,38 @@ export function ImageUpload({
       })
 
       setPreview(dataUrl)
-      onChange?.(file, dataUrl)
+      setIsUploading(false)
+
+      // Auto-save if enabled
+      let result: FileOperationResult | undefined = undefined
+      if (autoSave && campaignId) {
+        setIsSaving(true)
+        try {
+          result = await fileSystemService.saveUploadedFile(
+            campaignId,
+            fileType,
+            file,
+            {
+              fileName,
+              optimize,
+              optimizationOptions: fileSystemService.getOptimizationPresets(fileType),
+              overwrite: true
+            }
+          )
+
+          setSaveResult(result)
+          setIsSaved(true)
+          onSaveSuccess?.(result)
+        } catch (saveError) {
+          const saveErrorMsg = saveError instanceof Error ? saveError.message : 'Errore durante il salvataggio'
+          setError(saveErrorMsg)
+          onSaveError?.(saveErrorMsg)
+        } finally {
+          setIsSaving(false)
+        }
+      }
+
+      onChange?.(file, dataUrl, result)
     } catch (err) {
       const errorMsg = 'Errore durante il caricamento dell\'immagine'
       setError(errorMsg)
@@ -76,7 +133,7 @@ export function ImageUpload({
     } finally {
       setIsUploading(false)
     }
-  }, [validateFile, onChange, onError])
+  }, [validateFile, onChange, onError, autoSave, campaignId, fileType, fileName, optimize, onSaveSuccess, onSaveError])
 
   const handleFileSelect = useCallback((files: FileList | null) => {
     if (!files || files.length === 0) return
@@ -117,6 +174,8 @@ export function ImageUpload({
     e.stopPropagation()
     setPreview(null)
     setError(null)
+    setIsSaved(false)
+    setSaveResult(null)
     onChange?.(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
@@ -168,11 +227,30 @@ export function ImageUpload({
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200" />
+
+            {/* Save status indicator */}
+            {autoSave && (
+              <div className="absolute top-2 left-2 flex items-center gap-2">
+                {isSaving && (
+                  <div className="bg-blue-500 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
+                    <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+                    Salvataggio...
+                  </div>
+                )}
+                {isSaved && !isSaving && (
+                  <div className="bg-green-500 text-white px-2 py-1 rounded text-xs flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3" />
+                    Salvato
+                  </div>
+                )}
+              </div>
+            )}
+
             <Button
               variant="destructive"
               size="sm"
               onClick={handleRemove}
-              disabled={disabled}
+              disabled={disabled || isSaving}
               className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
               icon={<X className="w-4 h-4" />}
               aria-label="Remove image"

@@ -87,6 +87,25 @@ export interface IpcChannels {
     }
     output: FileOperationResult
   }
+  'filesystem:saveFileFromBuffer': {
+    input: {
+      campaignId: string
+      fileType: 'cover' | 'portrait' | 'map' | 'asset' | 'backup' | 'export'
+      fileName: string
+      buffer: ArrayBuffer
+      mimeType: string
+      optimize?: boolean
+      optimizationOptions?: {
+        maxWidth?: number
+        maxHeight?: number
+        quality?: number
+        format?: 'jpeg' | 'png' | 'webp'
+        progressive?: boolean
+      }
+      overwrite?: boolean
+    }
+    output: FileOperationResult
+  }
   'filesystem:deleteFile': {
     input: {
       campaignId: string
