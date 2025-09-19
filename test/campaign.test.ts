@@ -73,10 +73,6 @@ export const testCampaignData = {
   validCampaign: {
     name: 'Curse of Strahd',
     description: 'A gothic horror adventure in Barovia',
-    settings: {
-      theme: 'horror',
-      level: 'advanced'
-    }
   },
   
   invalidCampaign: {

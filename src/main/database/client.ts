@@ -1,7 +1,7 @@
 // Singleton PrismaClient for DM's Codex
 // Ensures single database connection across the application
 
-import { PrismaClient } from './generated/prisma'
+import { PrismaClient } from '@prisma/client'
 import { app } from 'electron'
 import path from 'path'
 import fs from 'fs-extra'

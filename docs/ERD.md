@@ -59,7 +59,6 @@ La radice di tutto. Ogni campagna è un universo narrativo autonomo.
 - `created_at` (timestamp)
 - `updated_at` (timestamp)
 - `last_played_at` (timestamp)
-- `settings` (JSON) - Configurazioni specifiche della campagna
 
 ### 2. **NPC** (Personaggio Non Giocante)
 PNG con focus narrativo, senza statistiche di combattimento.
