@@ -184,7 +184,6 @@ export function DataTable<T extends Record<string, any>>({
                 <TableHead className="w-12">
                   <Checkbox
                     checked={isAllSelected}
-                    indeterminate={isIndeterminate}
                     onCheckedChange={handleSelectAll}
                     aria-label="Select all"
                   />
