@@ -121,7 +121,13 @@ import {
   TabsList,
   TabsTrigger,
   TabsContent,
-  ImageUpload
+  ImageUpload,
+  ContentCard,
+  CampaignCard,
+  CharacterCard,
+  NPCCard,
+  LocationCard,
+  QuestCard
 } from '../components/ui'
 import {
   Sword,
@@ -156,7 +162,14 @@ import {
   MousePointer,
   MessageSquare,
   Grid3X3,
-  Package
+  Package,
+  MapPin,
+  Scroll,
+  Target,
+  Image,
+  User2,
+  Castle,
+  Sparkles
 } from 'lucide-react'
 
 export default function UIShowcase() {
@@ -1023,14 +1036,197 @@ function DataSection() {
 
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="tables" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+      <Tabs defaultValue="content-cards" className="w-full">
+        <TabsList className="grid w-full grid-cols-6">
+          <TabsTrigger value="content-cards">Content Cards</TabsTrigger>
           <TabsTrigger value="tables">Tables</TabsTrigger>
           <TabsTrigger value="badges">Badges</TabsTrigger>
           <TabsTrigger value="avatars">Avatars</TabsTrigger>
           <TabsTrigger value="progress">Progress</TabsTrigger>
           <TabsTrigger value="empty">Empty States</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="content-cards" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Content Cards</CardTitle>
+              <CardDescription>Cards versatili per visualizzare contenuti con overlay e varianti tematiche</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-8">
+                {/* Basic Content Cards */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-medium">Basic Content Cards</h4>
+                  <Grid cols={4} gap="lg">
+                    <ContentCard
+                      title="La Miniera Perduta"
+                      subtitle="Campagna epica"
+                      imageFallback={<Castle className="w-12 h-12 text-muted-foreground" />}
+                      stats={[
+                        { label: "Sessioni", value: 12, variant: "secondary" },
+                        { label: "Livello", value: "8-10", variant: "success" }
+                      ]}
+                      badges={[
+                        { label: "Attiva", variant: "success" }
+                      ]}
+                      onClick={() => showToast.info('Campagna selezionata')}
+                      onContextMenu={(action) => showToast.info(`Azione: ${action}`)}
+                    />
+
+                    <ContentCard
+                      title="Gandalf il Grigio"
+                      subtitle="Mago • Livello 20"
+                      imageFallback={<User2 className="w-12 h-12 text-muted-foreground" />}
+                      variant="character"
+                      stats={[
+                        { label: "HP", value: "78/90", variant: "warning" },
+                        { label: "MP", value: "145/150", variant: "secondary" }
+                      ]}
+                      badges={[
+                        { label: "PG", variant: "secondary" }
+                      ]}
+                      onClick={() => showToast.info('Personaggio selezionato')}
+                    />
+
+                    <ContentCard
+                      title="Elrond"
+                      subtitle="Signore di Gran Burrone"
+                      imageFallback={<Sparkles className="w-12 h-12 text-muted-foreground" />}
+                      variant="npc"
+                      stats={[
+                        { label: "Relazione", value: "Alleato", variant: "success" },
+                        { label: "CR", value: "15", variant: "destructive" }
+                      ]}
+                      badges={[
+                        { label: "PNG", variant: "outline" },
+                        { label: "Importante", variant: "warning" }
+                      ]}
+                      onClick={() => showToast.info('NPC selezionato')}
+                    />
+
+                    <ContentCard
+                      title="Gran Burrone"
+                      subtitle="Rifugio elfico"
+                      imageFallback={<MapPin className="w-12 h-12 text-muted-foreground" />}
+                      variant="location"
+                      stats={[
+                        { label: "Tipo", value: "Città", variant: "secondary" },
+                        { label: "Popolazione", value: "2.5k", variant: "success" }
+                      ]}
+                      badges={[
+                        { label: "Sicura", variant: "success" }
+                      ]}
+                      onClick={() => showToast.info('Locazione selezionata')}
+                    />
+                  </Grid>
+                </div>
+
+                {/* Variant-specific Cards */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-medium">Variant-specific Cards</h4>
+                  <Grid cols={3} gap="lg">
+                    <CampaignCard
+                      title="Il Regno dell'Ombra"
+                      subtitle="Campagna horror"
+                      imageFallback={<Image className="w-12 h-12 text-muted-foreground" />}
+                      stats={[
+                        { label: "Sessioni", value: 8, variant: "secondary" },
+                        { label: "Giocatori", value: 4, variant: "success" }
+                      ]}
+                      badges={[
+                        { label: "In pausa", variant: "warning" },
+                        { label: "Horror", variant: "destructive" }
+                      ]}
+                      onClick={() => showToast.info('Campagna horror selezionata')}
+                      onContextMenu={(action) => showToast.info(`Azione campagna: ${action}`)}
+                    />
+
+                    <LocationCard
+                      title="La Torre Nera"
+                      subtitle="Fortezza maledetta"
+                      imageFallback={<Castle className="w-12 h-12 text-muted-foreground" />}
+                      stats={[
+                        { label: "Pericolo", value: "Alto", variant: "destructive" },
+                        { label: "Piani", value: "7", variant: "secondary" }
+                      ]}
+                      badges={[
+                        { label: "Dungeon", variant: "destructive" },
+                        { label: "Boss", variant: "warning" }
+                      ]}
+                      onClick={() => showToast.info('Dungeon selezionato')}
+                    />
+
+                    <QuestCard
+                      title="La Ricerca dell'Anello"
+                      subtitle="Quest principale"
+                      imageFallback={<Target className="w-12 h-12 text-muted-foreground" />}
+                      stats={[
+                        { label: "Progresso", value: "60%", variant: "warning" },
+                        { label: "Ricompensa", value: "Epica", variant: "success" }
+                      ]}
+                      badges={[
+                        { label: "Principale", variant: "success" },
+                        { label: "Attiva", variant: "secondary" }
+                      ]}
+                      onClick={() => showToast.info('Quest selezionata')}
+                    />
+                  </Grid>
+                </div>
+
+                {/* Interactive Examples */}
+                <div className="space-y-4">
+                  <h4 className="text-sm font-medium">Interactive Examples</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Clicca per aprire, tasto destro per menu contestuale
+                  </p>
+                  <Grid cols={2} gap="lg">
+                    <NPCCard
+                      title="Sauron"
+                      subtitle="Signore Oscuro"
+                      imageFallback={<Swords className="w-12 h-12 text-muted-foreground" />}
+                      stats={[
+                        { label: "CR", value: "30", variant: "destructive" },
+                        { label: "Stato", value: "Nemico", variant: "destructive" }
+                      ]}
+                      badges={[
+                        { label: "Boss Finale", variant: "destructive" },
+                        { label: "Leggendario", variant: "warning" }
+                      ]}
+                      onClick={() => showToast.success('Battaglia epica iniziata!')}
+                      onContextMenu={(action) => {
+                        if (action === 'delete') {
+                          showToast.warning('Non puoi eliminare il boss finale!')
+                        } else {
+                          showToast.info(`Azione su Sauron: ${action}`)
+                        }
+                      }}
+                    />
+
+                    <CharacterCard
+                      title="Frodo Baggins"
+                      subtitle="Halfling • Livello 3"
+                      imageFallback={<User className="w-12 h-12 text-muted-foreground" />}
+                      stats={[
+                        { label: "HP", value: "25/30", variant: "warning" },
+                        { label: "Coraggiio", value: "Max", variant: "success" }
+                      ]}
+                      badges={[
+                        { label: "Portatore", variant: "warning" },
+                        { label: "Eroe", variant: "success" }
+                      ]}
+                      onClick={() => showToast.info('Il piccolo grande eroe!')}
+                      onContextMenu={(action) => showToast.info(`Azione su Frodo: ${action}`)}
+                    >
+                      <div className="text-xs text-white/60">
+                        "Condividerò questo peso con te, per quanto dovrò"
+                      </div>
+                    </CharacterCard>
+                  </Grid>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="tables" className="space-y-6">
           <Card>
